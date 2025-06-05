@@ -13,7 +13,7 @@ A powerful, multi-algorithm plagiarism detection system built with Streamlit, de
 - 🔒 **Privacy-First Design**: All code processed locally
 - 📂 **Rich Metadata Extraction** (Cyclomatic complexity, function count, etc.)
 - 🧩 **Custom Configuration System** for thresholds, preprocessing, and more
-
+- 🧩 **LIVE HERE ->** https://competitiveprogramming-plagiarismcheckeradvversion-uuhprt5wpal.streamlit.app/
 ---
 
 ## 🧰 Algorithms Implemented
