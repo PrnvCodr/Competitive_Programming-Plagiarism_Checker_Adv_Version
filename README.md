@@ -14,7 +14,8 @@ A powerful, multi-algorithm plagiarism detection system built with Streamlit, de
 - 📂 **Rich Metadata Extraction** (Cyclomatic complexity, function count, etc.)
 - 🧩 **Custom Configuration System** for thresholds, preprocessing, and more
 
-[🔗 Live Demo]([https://competitiveprogramming-plagiarismcheckeradvversion-uuhprt5wpal.streamlit.app/])
+[🔗 Live Demo](https://competitiveprogramming-plagiarismcheckeradvversion-uuhprt5wpal.streamlit.app/)
+
 
 ---
 
