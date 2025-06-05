@@ -1,21 +1,8 @@
-# Core libraries (usually come with Python)
-hashlib
-re
-collections
-itertools
-io
-base64
-datetime
-zipfile
-tempfile
-os
-
-# Third-party libraries (install via pip)
-streamlit==1.35.0
-pandas==2.2.2
-numpy==1.26.4
-matplotlib==3.8.4
-seaborn==0.13.2
-plotly==5.21.0
-networkx==3.3
-scikit-learn==1.4.2
+streamlit>=1.25
+pandas>=1.5
+numpy>=1.22
+matplotlib>=3.6
+seaborn>=0.12
+plotly>=5.10
+networkx>=2.8
+scikit-learn>=1.2
