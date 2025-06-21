@@ -24,7 +24,7 @@ import os
 # Configure Streamlit page
 st.set_page_config(
     page_title="Competitive Programming Plagiarism Checker",
-    page_icon="âš¡",
+    page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -282,7 +282,7 @@ class CompetitiveProgrammingPlagiarismDetector:
                 control_structures.append((structure, match.start()))
         
         return sorted(control_structures, key=lambda x: x[1])
-    
+
     def winnowing_fingerprint_advanced(self, tokens, k=7, w=5):
         """Advanced winnowing with better parameters for C++"""
         if len(tokens) < k:
@@ -595,13 +595,13 @@ class CompetitiveProgrammingPlagiarismDetector:
                 
                 # Determine risk level
                 if similarity >= 0.8:
-                    risk = "ðŸ”´ High Risk"
+                    risk = "High Risk"
                 elif similarity >= 0.6:
-                    risk = "ðŸŸ¡ Medium Risk"
+                    risk = "Medium Risk"
                 elif similarity >= threshold:
-                    risk = "ðŸŸ  Low Risk"
+                    risk = "Low Risk"
                 else:
-                    risk = "ðŸŸ¢ Safe"
+                    risk = "Safe"
                 
                 results.append({
                     'File 1': file1,
@@ -651,10 +651,10 @@ def create_advanced_visualizations(detector, results, algorithm):
         names=list(risk_counts.keys()),
         title="Risk Level Distribution",
         color_discrete_map={
-            "ðŸ”´ High Risk": "#e53e3e",
-            "ðŸŸ¡ Medium Risk": "#d69e2e", 
-            "ðŸŸ  Low Risk": "#dd6b20",
-            "ðŸŸ¢ Safe": "#38a169"
+            "High Risk": "#e53e3e",
+            "Medium Risk": "#d69e2e", 
+            "Low Risk": "#dd6b20",
+            "Safe": "#38a169"
         }
     )
     
@@ -678,9 +678,9 @@ def generate_detailed_report(detector, results, algorithm, threshold):
     suspicious_pairs = sum(1 for r in results if r['Status'] == 'Suspicious')
     
     report = f"""
-# ðŸ† Competitive Programming Plagiarism Analysis Report
+# Competitive Programming Plagiarism Analysis Report
 
-## ðŸ“Š Executive Summary
+## Executive Summary
 - **Analysis Date**: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 - **Algorithm Used**: {algorithm}
 - **Detection Threshold**: {threshold:.2f}
@@ -689,12 +689,12 @@ def generate_detailed_report(detector, results, algorithm, threshold):
 - **Suspicious Pairs**: {suspicious_pairs}
 - **Detection Rate**: {(suspicious_pairs/total_comparisons*100):.1f}%
 
-## ðŸ” File Analysis Details
+## File Analysis Details
 """
     
     for filename, metadata in detector.file_metadata.items():
         report += f"""
-### ðŸ“„ {filename}
+### {filename}
 - **Size**: {metadata['size']} bytes
 - **Lines of Code**: {metadata['lines']}
 - **Functions**: {metadata['functions']}
@@ -702,11 +702,11 @@ def generate_detailed_report(detector, results, algorithm, threshold):
 - **Includes**: {len(metadata['includes'])}
 """
     
-    report += "\n## ðŸš¨ High-Risk Comparisons\n"
+    report += "\n## High-Risk Comparisons\n"
     
     high_risk = [r for r in results if r['Similarity'] >= 0.8]
     for result in high_risk[:10]:  # Top 10
-        report += f"- **{result['File 1']}** â†” **{result['File 2']}**: {result['Percentage']} similarity\n"
+        report += f"- **{result['File 1']}** → **{result['File 2']}**: {result['Percentage']} similarity\n"
     
     return report
 
@@ -714,7 +714,7 @@ def main():
     # Header
     st.markdown("""
     <div class="main-header">
-        <h1>âš¡ Competitive Programming Plagiarism Checker</h1>
+        <h1>Competitive Programming Plagiarism Checker</h1>
         <p>Advanced C++ Code Similarity Detection for Competitive Programming</p>
     </div>
     """, unsafe_allow_html=True)
@@ -725,10 +725,10 @@ def main():
     
     # Sidebar
     with st.sidebar:
-        st.header("ðŸ”§ Configuration Panel")
+        st.header("Configuration Panel")
         
         # File upload section
-        st.subheader("ðŸ“ Upload C++ Files")
+        st.subheader("Upload C++ Files")
         uploaded_files = st.file_uploader(
             "Choose C++ files",
             type=['cpp', 'cc', 'cxx', 'c'],
@@ -737,7 +737,7 @@ def main():
         )
         
         # Bulk upload option
-        st.subheader("ðŸ“¦ Bulk Upload (ZIP)")
+        st.subheader("Bulk Upload (ZIP)")
         zip_file = st.file_uploader(
             "Upload ZIP file containing C++ files",
             type=['zip'],
@@ -745,7 +745,7 @@ def main():
         )
         
         # Algorithm selection
-        st.subheader("ðŸ§  Detection Algorithm")
+        st.subheader("Detection Algorithm")
         algorithm = st.selectbox(
             "Select Algorithm",
             st.session_state.detector.algorithms,
@@ -754,7 +754,7 @@ def main():
         )
         
         # Advanced settings
-        st.subheader("âš™ï¸ Advanced Settings")
+        st.subheader("Advanced Settings")
         threshold = st.slider(
             "Similarity Threshold",
             min_value=0.0,
@@ -779,7 +779,7 @@ def main():
         )
         
         # Analysis options
-        st.subheader("ðŸ” Analysis Options")
+        st.subheader("Analysis Options")
         ignore_includes = st.checkbox("Ignore #include statements", value=True)
         ignore_comments = st.checkbox("Ignore comments", value=True)
         normalize_whitespace = st.checkbox("Normalize whitespace", value=True)
@@ -833,15 +833,15 @@ def main():
                 
                 # File validation
                 if file_size < min_file_size:
-                    st.sidebar.warning(f"âš ï¸ {uploaded_file.name} too small ({file_size} bytes)")
+                    st.sidebar.warning(f"Warning: {uploaded_file.name} too small ({file_size} bytes)")
                     skipped_count += 1
                     continue
                 elif file_size > max_file_size * 1024:
-                    st.sidebar.warning(f"âš ï¸ {uploaded_file.name} too large ({file_size/1024:.1f} KB)")
+                    st.sidebar.warning(f"Warning: {uploaded_file.name} too large ({file_size/1024:.1f} KB)")
                     skipped_count += 1
                     continue
                 elif len(content.strip()) == 0:
-                    st.sidebar.warning(f"âš ï¸ {uploaded_file.name} is empty")
+                    st.sidebar.warning(f"Warning: {uploaded_file.name} is empty")
                     skipped_count += 1
                     continue
                 
@@ -849,7 +849,7 @@ def main():
                 processed_count += 1
                 
             except Exception as e:
-                st.sidebar.error(f"âŒ Error processing {uploaded_file.name}: {str(e)}")
+                st.sidebar.error(f"Error processing {uploaded_file.name}: {str(e)}")
                 skipped_count += 1
     
     # Display file statistics
@@ -858,49 +858,49 @@ def main():
     if file_count > 0:
         col1, col2, col3 = st.columns(3)
         with col1:
-            st.metric("ðŸ“ Files Loaded", file_count)
+            st.metric("Files Loaded", file_count)
         with col2:
             if 'processed_count' in locals():
-                st.metric("âœ… Processed", processed_count)
+                st.metric("Processed", processed_count)
         with col3:
             if 'skipped_count' in locals():
-                st.metric("â­ï¸ Skipped", skipped_count)
+                st.metric("Skipped", skipped_count)
     
     if file_count < 2:
-        st.info("ðŸ‘† Please upload at least 2 C++ files to start plagiarism detection.")
+        st.info("Please upload at least 2 C++ files to start plagiarism detection.")
         
         # Show sample code for demonstration
-        with st.expander("ðŸ“– View Sample Analysis"):
+        with st.expander("View Sample Analysis"):
             st.markdown("""
             ### Sample C++ Code Comparison
             
             **Features of this plagiarism checker:**
-            - ðŸ” **12 Advanced Algorithms** including MOSS simulation
-            - ðŸŽ¯ **Variable Renaming Detection** 
-            - ðŸ“Š **Control Flow Analysis**
-            - ðŸ”„ **Structure-based Comparison**
-            - ðŸ“ˆ **Interactive Visualizations**
-            - ðŸ“‹ **Detailed Reports**
-            - ðŸš€ **Optimized for Competitive Programming**
+            - **12 Advanced Algorithms** including MOSS simulation
+            - **Variable Renaming Detection** 
+            - **Control Flow Analysis**
+            - **Structure-based Comparison**
+            - **Interactive Visualizations**
+            - **Detailed Reports**
+            - **Optimized for Competitive Programming**
             """)
         return
     
     # Main analysis tabs
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "ðŸ“Š Analysis Results", 
-        "ðŸ“ˆ Visualizations", 
-        "ðŸ” Code Comparison", 
-        "ðŸ“‹ Detailed Report",
-        "ðŸ“ File Explorer",
-        "ðŸ“¥ Export Results"
+        "Analysis Results", 
+        "Visualizations", 
+        "Code Comparison", 
+        "Detailed Report",
+        "File Explorer",
+        "Export Results"
     ])
     
     # Calculate results
-    with st.spinner(f"ðŸ”„ Analyzing {file_count} files using {algorithm}..."):
+    with st.spinner(f"Analyzing {file_count} files using {algorithm}..."):
         results = st.session_state.detector.compare_all_files(algorithm, threshold)
     
     with tab1:
-        st.header("ðŸ“Š Plagiarism Analysis Results")
+        st.header("Plagiarism Analysis Results")
         
         if results:
             # Summary metrics
@@ -909,7 +909,7 @@ def main():
             with col1:
                 st.markdown("""
                 <div class="metric-card">
-                    <h3>ðŸ” Total Comparisons</h3>
+                    <h3>Total Comparisons</h3>
                     <h2>{}</h2>
                 </div>
                 """.format(len(results)), unsafe_allow_html=True)
@@ -918,7 +918,7 @@ def main():
                 suspicious_count = sum(1 for r in results if r['Status'] == 'Suspicious')
                 st.markdown("""
                 <div class="metric-card">
-                    <h3>ðŸš¨ Suspicious Pairs</h3>
+                    <h3>Suspicious Pairs</h3>
                     <h2>{}</h2>
                 </div>
                 """.format(suspicious_count), unsafe_allow_html=True)
@@ -927,7 +927,7 @@ def main():
                 avg_similarity = np.mean([r['Similarity'] for r in results])
                 st.markdown("""
                 <div class="metric-card">
-                    <h3>ðŸ“Š Average Similarity</h3>
+                    <h3>Average Similarity</h3>
                     <h2>{:.1f}%</h2>
                 </div>
                 """.format(avg_similarity * 100), unsafe_allow_html=True)
@@ -936,7 +936,7 @@ def main():
                 max_similarity = max([r['Similarity'] for r in results])
                 st.markdown("""
                 <div class="metric-card">
-                    <h3>âš ï¸ Highest Similarity</h3>
+                    <h3>Highest Similarity</h3>
                     <h2>{:.1f}%</h2>
                 </div>
                 """.format(max_similarity * 100), unsafe_allow_html=True)
@@ -947,7 +947,6 @@ def main():
             df = pd.DataFrame(results)
             
             # Color coding function
-            # Color coding function with better contrast
             def highlight_risk(row):
                 if row['Similarity'] >= 0.8:
                     return ['background-color: #fed7d7; color: #742a2a; font-weight: bold;'] * len(row)
@@ -957,13 +956,12 @@ def main():
                     return ['background-color: #feebc8; color: #7c2d12; font-weight: bold;'] * len(row)
                 else:
                     return ['background-color: #f0fff4; color: #22543d; font-weight: bold;'] * len(row)
-
             
             styled_df = df.style.apply(highlight_risk, axis=1)
             st.dataframe(styled_df, use_container_width=True, height=400)
             
             # Top suspicious pairs
-            st.subheader("ðŸ”´ Most Suspicious Pairs")
+            st.subheader("Most Suspicious Pairs")
             top_suspicious = [r for r in results if r['Similarity'] >= 0.7][:5]
             
             for result in top_suspicious:
@@ -974,7 +972,7 @@ def main():
                 
                 st.markdown(f"""
                 <div class="{card_class}">
-                    <h4>{result['File 1']} â†” {result['File 2']}</h4>
+                    <h4>{result['File 1']} → {result['File 2']}</h4>
                     <p><strong>Similarity:</strong> {result['Percentage']} | <strong>Risk:</strong> {result['Risk Level']}</p>
                 </div>
                 """, unsafe_allow_html=True)
@@ -983,7 +981,7 @@ def main():
             st.info("No results to display.")
     
     with tab2:
-        st.header("ðŸ“ˆ Advanced Visualizations")
+        st.header("Advanced Visualizations")
         
         if results and len(results) > 0:
             fig_heatmap, fig_risk, fig_dist = create_advanced_visualizations(
@@ -991,21 +989,21 @@ def main():
             )
             
             # Interactive similarity matrix
-            st.subheader("ðŸ”¥ Interactive Similarity Heatmap")
+            st.subheader("Interactive Similarity Heatmap")
             st.plotly_chart(fig_heatmap, use_container_width=True)
             
             col1, col2 = st.columns(2)
             
             with col1:
-                st.subheader("ðŸŽ¯ Risk Level Distribution")
+                st.subheader("Risk Level Distribution")
                 st.plotly_chart(fig_risk, use_container_width=True)
             
             with col2:
-                st.subheader("ðŸ“Š Similarity Score Distribution")
+                st.subheader("Similarity Score Distribution")
                 st.plotly_chart(fig_dist, use_container_width=True)
             
             # Network graph for high similarities
-            st.subheader("ðŸ•¸ï¸ Similarity Network")
+            st.subheader("Similarity Network")
             high_sim_results = [r for r in results if r['Similarity'] >= threshold]
             
             if high_sim_results:
@@ -1033,7 +1031,7 @@ def main():
                     x1, y1 = pos[edge[1]]
                     edge_x.extend([x0, x1, None])
                     edge_y.extend([y0, y1, None])
-                    edge_info.append(f"{edge[0]} â†” {edge[1]}: {G[edge[0]][edge[1]]['similarity']}")
+                    edge_info.append(f"{edge[0]} → {edge[1]}: {G[edge[0]][edge[1]]['similarity']}")
                 
                 edge_trace = go.Scatter(x=edge_x, y=edge_y,
                                       line=dict(width=2, color='red'),
@@ -1082,7 +1080,7 @@ def main():
             st.info("No data available for visualization.")
     
     with tab3:
-        st.header("ðŸ” Side-by-Side Code Comparison")
+        st.header("Side-by-Side Code Comparison")
         
         if file_count >= 2:
             filenames = list(st.session_state.detector.files.keys())
@@ -1095,7 +1093,7 @@ def main():
             
             if file1 != file2:
                 # Calculate similarity with multiple algorithms
-                st.subheader("ðŸŽ¯ Multi-Algorithm Analysis")
+                st.subheader("Multi-Algorithm Analysis")
                 
                 similarities = {}
                 for alg in st.session_state.detector.algorithms[:6]:  # Top 6 algorithms
@@ -1106,11 +1104,11 @@ def main():
                 cols = st.columns(3)
                 for i, (alg, sim) in enumerate(similarities.items()):
                     with cols[i % 3]:
-                        color = "ðŸ”´" if sim >= 0.8 else "ðŸŸ¡" if sim >= 0.6 else "ðŸŸ¢"
+                        color = "Red" if sim >= 0.8 else "Yellow" if sim >= 0.6 else "Green"
                         st.metric(f"{color} {alg}", f"{sim:.3f}", f"{sim*100:.1f}%")
                 
                 # File metadata comparison
-                st.subheader("ðŸ“Š File Metadata Comparison")
+                st.subheader("File Metadata Comparison")
                 meta1 = st.session_state.detector.file_metadata[file1]
                 meta2 = st.session_state.detector.file_metadata[file2]
                 
@@ -1122,19 +1120,19 @@ def main():
                 st.dataframe(comparison_df, use_container_width=True)
                 
                 # Side-by-side code display
-                st.subheader("ðŸ“„ Code Comparison")
+                st.subheader("Code Comparison")
                 col1, col2 = st.columns(2)
                 
                 with col1:
-                    st.markdown(f"**ðŸ“„ {file1}**")
+                    st.markdown(f"**{file1}**")
                     st.code(st.session_state.detector.files[file1], language='cpp', line_numbers=True)
                 
                 with col2:
-                    st.markdown(f"**ðŸ“„ {file2}**")
+                    st.markdown(f"**{file2}**")
                     st.code(st.session_state.detector.files[file2], language='cpp', line_numbers=True)
                 
                 # Detailed diff analysis
-                st.subheader("ðŸ” Detailed Difference Analysis")
+                st.subheader("Detailed Difference Analysis")
                 
                 code1_lines = st.session_state.detector.files[file1].splitlines()
                 code2_lines = st.session_state.detector.files[file2].splitlines()
@@ -1146,13 +1144,13 @@ def main():
                     diff_text = '\n'.join(diff)
                     st.code(diff_text, language='diff')
                 else:
-                    st.success("âœ… Files are identical!")
+                    st.success("Files are identical!")
             
             else:
-                st.warning("âš ï¸ Please select different files to compare.")
+                st.warning("Please select different files to compare.")
     
     with tab4:
-        st.header("ðŸ“‹ Detailed Analysis Report")
+        st.header("Detailed Analysis Report")
         
         if results:
             report = generate_detailed_report(
@@ -1162,7 +1160,7 @@ def main():
             st.markdown(report)
             
             # Advanced statistics
-            st.subheader("ðŸ“ˆ Statistical Analysis")
+            st.subheader("Statistical Analysis")
             
             similarities = [r['Similarity'] for r in results]
             
@@ -1183,62 +1181,62 @@ def main():
                 'Similarity Score': [f"{v:.3f}" for v in perc_values]
             })
             
-            st.subheader("ðŸ“Š Percentile Analysis")
+            st.subheader("Percentile Analysis")
             st.dataframe(perc_df, use_container_width=True)
         
         else:
             st.info("No results available for detailed report.")
     
     with tab5:
-        st.header("ðŸ“ File Explorer & Metadata")
+        st.header("File Explorer & Metadata")
         
         if st.session_state.detector.files:
             for filename, content in st.session_state.detector.files.items():
-                with st.expander(f"ðŸ“„ {filename}"):
+                with st.expander(f"{filename}"):
                     metadata = st.session_state.detector.file_metadata[filename]
                     
                     col1, col2 = st.columns([1, 2])
                     
                     with col1:
-                        st.markdown("**ðŸ“Š File Statistics:**")
-                        st.write(f"â€¢ Size: {metadata['size']} bytes")
-                        st.write(f"â€¢ Lines: {metadata['lines']}")
-                        st.write(f"â€¢ Functions: {metadata['functions']}")
-                        st.write(f"â€¢ Complexity: {metadata['complexity']}")
-                        st.write(f"â€¢ Includes: {len(metadata['includes'])}")
-                        st.write(f"â€¢ Uploaded: {metadata['upload_time'].strftime('%H:%M:%S')}")
+                        st.markdown("**File Statistics:**")
+                        st.write(f"• Size: {metadata['size']} bytes")
+                        st.write(f"• Lines: {metadata['lines']}")
+                        st.write(f"• Functions: {metadata['functions']}")
+                        st.write(f"• Complexity: {metadata['complexity']}")
+                        st.write(f"• Includes: {len(metadata['includes'])}")
+                        st.write(f"• Uploaded: {metadata['upload_time'].strftime('%H:%M:%S')}")
                         
                         if metadata['includes']:
-                            st.markdown("**ðŸ“š Includes:**")
+                            st.markdown("**Includes:**")
                             for include in metadata['includes']:
                                 st.code(include, language='cpp')
                     
-                                with col2:
-                                    st.markdown("**ðŸ“„ Code Preview:**")
-                                    preview_lines = content.split('\n')[:20]
-                                    preview = '\n'.join(preview_lines)
-                                    if len(content.split('\n')) > 20:
-                                        lines_count = len(content.split('\n')) - 20
-                                        preview += f"\n... ({lines_count} more lines)"
-                                    st.code(preview, language='cpp')
+                    with col2:
+                        st.markdown("**Code Preview:**")
+                        preview_lines = content.split('\n')[:20]
+                        preview = '\n'.join(preview_lines)
+                        if len(content.split('\n')) > 20:
+                            lines_count = len(content.split('\n')) - 20
+                            preview += f"\n... ({lines_count} more lines)"
+                        st.code(preview, language='cpp')
 
         else:
             st.info("No files uploaded yet.")
     
     with tab6:
-        st.header("ðŸ“¥ Export & Download Results")
+        st.header("Export & Download Results")
         
         if results:
             col1, col2 = st.columns(2)
             
             with col1:
-                st.subheader("ðŸ“Š Export Options")
+                st.subheader("Export Options")
                 
                 # CSV Export
                 df = pd.DataFrame(results)
                 csv = df.to_csv(index=False)
                 st.download_button(
-                    label="ðŸ“Š Download CSV Report",
+                    label="Download CSV Report",
                     data=csv,
                     file_name=f"plagiarism_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
                     mime="text/csv"
@@ -1248,7 +1246,7 @@ def main():
                 import json
                 json_data = json.dumps(results, indent=2, default=str)
                 st.download_button(
-                    label="ðŸ“‹ Download JSON Report",
+                    label="Download JSON Report",
                     data=json_data,
                     file_name=f"plagiarism_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
                     mime="application/json"
@@ -1259,20 +1257,20 @@ def main():
                     st.session_state.detector, results, algorithm, threshold
                 )
                 st.download_button(
-                    label="ðŸ“„ Download Detailed Report",
+                    label="Download Detailed Report",
                     data=detailed_report,
                     file_name=f"detailed_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
                     mime="text/markdown"
                 )
             
             with col2:
-                st.subheader("ðŸ“ˆ Export Settings")
+                st.subheader("Export Settings")
                 
                 include_metadata = st.checkbox("Include file metadata", value=True)
                 include_code_snippets = st.checkbox("Include code snippets", value=False)
                 only_suspicious = st.checkbox("Only suspicious pairs", value=False)
                 
-                if st.button("ðŸŽ¯ Generate Custom Report"):
+                if st.button("Generate Custom Report"):
                     custom_results = results
                     if only_suspicious:
                         custom_results = [r for r in results if r['Status'] == 'Suspicious']
@@ -1289,7 +1287,7 @@ Total Comparisons: {len(custom_results)}
                     
                     for result in custom_results:
                         custom_report += f"""
-### {result['File 1']} â†” {result['File 2']}
+### {result['File 1']} → {result['File 2']}
 - Similarity: {result['Percentage']}
 - Risk Level: {result['Risk Level']}
 - Status: {result['Status']}
@@ -1305,7 +1303,7 @@ Total Comparisons: {len(custom_results)}
 """
                     
                     st.download_button(
-                        label="ðŸ“‹ Download Custom Report",
+                        label="Download Custom Report",
                         data=custom_report,
                         file_name=f"custom_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
                         mime="text/markdown"
@@ -1318,9 +1316,9 @@ Total Comparisons: {len(custom_results)}
     st.markdown("---")
     st.markdown("""
     <div style="text-align: center; color: #666; padding: 2rem;">
-        <h3>âš¡ Competitive Programming Plagiarism Checker</h3>
+        <h3>Competitive Programming Plagiarism Checker</h3>
         <p>Advanced C++ code similarity detection with 12 sophisticated algorithms</p>
-        <p>Built for competitive programming â€¢ Optimized for accuracy â€¢ Enhanced UI</p>
+        <p>Built for competitive programming • Optimized for accuracy • Enhanced UI</p>
     </div>
     """, unsafe_allow_html=True)
 
