@@ -1002,7 +1002,7 @@ def main():
                 st.subheader("Similarity Score Distribution")
                 st.plotly_chart(fig_dist, use_container_width=True)
             
-            # Network graph for high similarities
+            # Network graph for high similarities - FIXED VERSION
             st.subheader("Similarity Network")
             high_sim_results = [r for r in results if r['Similarity'] >= threshold]
             
@@ -1057,20 +1057,31 @@ def main():
                                                 color='lightblue',
                                                 line=dict(width=2, color='black')))
                 
-                fig_network = go.Figure(data=[edge_trace, node_trace],
-                                      layout=go.Layout(
-                                        title='Similarity Network (Above Threshold)',
-                                        titlefont_size=16,
-                                        showlegend=False,
-                                        hovermode='closest',
-                                        margin=dict(b=20,l=5,r=5,t=40),
-                                        annotations=[ dict(
-                                            text="Connections show similarities above threshold",
-                                            showarrow=False,
-                                            xref="paper", yref="paper",
-                                            x=0.005, y=-0.002 ) ],
-                                        xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                                        yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)))
+                # FIXED: Create figure first, then update layout
+                fig_network = go.Figure()
+                fig_network.add_trace(edge_trace)
+                fig_network.add_trace(node_trace)
+                
+                # Update layout separately
+                fig_network.update_layout(
+                    title=dict(
+                        text='Similarity Network (Above Threshold)',
+                        font=dict(size=16)
+                    ),
+                    showlegend=False,
+                    hovermode='closest',
+                    margin=dict(b=20, l=5, r=5, t=40),
+                    xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
+                    yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)
+                )
+                
+                # Add annotation separately
+                fig_network.add_annotation(
+                    text="Connections show similarities above threshold",
+                    showarrow=False,
+                    xref="paper", yref="paper",
+                    x=0.005, y=-0.002
+                )
                 
                 st.plotly_chart(fig_network, use_container_width=True)
             else:
