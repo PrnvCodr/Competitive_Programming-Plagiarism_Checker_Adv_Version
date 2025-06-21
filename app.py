@@ -680,7 +680,7 @@ def generate_detailed_report(detector, results, algorithm, threshold):
     report = f"""
 # 🏆 Competitive Programming Plagiarism Analysis Report
 
-## 📊 Executive Summary
+##  Executive Summary
 - **Analysis Date**: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 - **Algorithm Used**: {algorithm}
 - **Detection Threshold**: {threshold:.2f}
@@ -689,7 +689,7 @@ def generate_detailed_report(detector, results, algorithm, threshold):
 - **Suspicious Pairs**: {suspicious_pairs}
 - **Detection Rate**: {(suspicious_pairs/total_comparisons*100):.1f}%
 
-## 🔍 File Analysis Details
+##  File Analysis Details
 """
     
     for filename, metadata in detector.file_metadata.items():
@@ -745,7 +745,7 @@ def main():
         )
         
         # Algorithm selection
-        st.subheader("🧠 Detection Algorithm")
+        st.subheader(" Detection Algorithm")
         algorithm = st.selectbox(
             "Select Algorithm",
             st.session_state.detector.algorithms,
@@ -779,7 +779,7 @@ def main():
         )
         
         # Analysis options
-        st.subheader("🔍 Analysis Options")
+        st.subheader(" Analysis Options")
         ignore_includes = st.checkbox("Ignore #include statements", value=True)
         ignore_comments = st.checkbox("Ignore comments", value=True)
         normalize_whitespace = st.checkbox("Normalize whitespace", value=True)
@@ -875,32 +875,32 @@ def main():
             ### Sample C++ Code Comparison
             
             **Features of this plagiarism checker:**
-            - 🔍 **12 Advanced Algorithms** including MOSS simulation
-            - 🎯 **Variable Renaming Detection** 
-            - 📊 **Control Flow Analysis**
-            - 🔄 **Structure-based Comparison**
-            - 📈 **Interactive Visualizations**
-            - 📋 **Detailed Reports**
-            - 🚀 **Optimized for Competitive Programming**
+            -  **12 Advanced Algorithms** including MOSS simulation
+            -  **Variable Renaming Detection** 
+            -  **Control Flow Analysis**
+            -  **Structure-based Comparison**
+            -  **Interactive Visualizations**
+            -  **Detailed Reports**
+            -  **Optimized for Competitive Programming**
             """)
         return
     
     # Main analysis tabs
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "📊 Analysis Results", 
-        "📈 Visualizations", 
-        "🔍 Code Comparison", 
-        "📋 Detailed Report",
-        "📁 File Explorer",
-        "📥 Export Results"
+        " Analysis Results", 
+        " Visualizations", 
+        " Code Comparison", 
+        " Detailed Report",
+        " File Explorer",
+        " Export Results"
     ])
     
     # Calculate results
-    with st.spinner(f"🔄 Analyzing {file_count} files using {algorithm}..."):
+    with st.spinner(f" Analyzing {file_count} files using {algorithm}..."):
         results = st.session_state.detector.compare_all_files(algorithm, threshold)
     
     with tab1:
-        st.header("📊 Plagiarism Analysis Results")
+        st.header(" Plagiarism Analysis Results")
         
         if results:
             # Summary metrics
@@ -909,7 +909,7 @@ def main():
             with col1:
                 st.markdown("""
                 <div class="metric-card">
-                    <h3>🔍 Total Comparisons</h3>
+                    <h3> Total Comparisons</h3>
                     <h2>{}</h2>
                 </div>
                 """.format(len(results)), unsafe_allow_html=True)
@@ -927,7 +927,7 @@ def main():
                 avg_similarity = np.mean([r['Similarity'] for r in results])
                 st.markdown("""
                 <div class="metric-card">
-                    <h3>📊 Average Similarity</h3>
+                    <h3> Average Similarity</h3>
                     <h2>{:.1f}%</h2>
                 </div>
                 """.format(avg_similarity * 100), unsafe_allow_html=True)
@@ -983,7 +983,7 @@ def main():
             st.info("No results to display.")
     
     with tab2:
-        st.header("📈 Advanced Visualizations")
+        st.header(" Advanced Visualizations")
         
         if results and len(results) > 0:
             fig_heatmap, fig_risk, fig_dist = create_advanced_visualizations(
@@ -997,11 +997,11 @@ def main():
             col1, col2 = st.columns(2)
             
             with col1:
-                st.subheader("🎯 Risk Level Distribution")
+                st.subheader(" Risk Level Distribution")
                 st.plotly_chart(fig_risk, use_container_width=True)
             
             with col2:
-                st.subheader("📊 Similarity Score Distribution")
+                st.subheader(" Similarity Score Distribution")
                 st.plotly_chart(fig_dist, use_container_width=True)
             
             # Network graph for high similarities
@@ -1082,7 +1082,7 @@ def main():
             st.info("No data available for visualization.")
     
     with tab3:
-        st.header("🔍 Side-by-Side Code Comparison")
+        st.header(" Side-by-Side Code Comparison")
         
         if file_count >= 2:
             filenames = list(st.session_state.detector.files.keys())
@@ -1095,7 +1095,7 @@ def main():
             
             if file1 != file2:
                 # Calculate similarity with multiple algorithms
-                st.subheader("🎯 Multi-Algorithm Analysis")
+                st.subheader(" Multi-Algorithm Analysis")
                 
                 similarities = {}
                 for alg in st.session_state.detector.algorithms[:6]:  # Top 6 algorithms
@@ -1110,7 +1110,7 @@ def main():
                         st.metric(f"{color} {alg}", f"{sim:.3f}", f"{sim*100:.1f}%")
                 
                 # File metadata comparison
-                st.subheader("📊 File Metadata Comparison")
+                st.subheader(" File Metadata Comparison")
                 meta1 = st.session_state.detector.file_metadata[file1]
                 meta2 = st.session_state.detector.file_metadata[file2]
                 
@@ -1122,7 +1122,7 @@ def main():
                 st.dataframe(comparison_df, use_container_width=True)
                 
                 # Side-by-side code display
-                st.subheader("📄 Code Comparison")
+                st.subheader(" Code Comparison")
                 col1, col2 = st.columns(2)
                 
                 with col1:
@@ -1134,7 +1134,7 @@ def main():
                     st.code(st.session_state.detector.files[file2], language='cpp', line_numbers=True)
                 
                 # Detailed diff analysis
-                st.subheader("🔍 Detailed Difference Analysis")
+                st.subheader(" Detailed Difference Analysis")
                 
                 code1_lines = st.session_state.detector.files[file1].splitlines()
                 code2_lines = st.session_state.detector.files[file2].splitlines()
@@ -1152,7 +1152,7 @@ def main():
                 st.warning("⚠️ Please select different files to compare.")
     
     with tab4:
-        st.header("📋 Detailed Analysis Report")
+        st.header(" Detailed Analysis Report")
         
         if results:
             report = generate_detailed_report(
@@ -1162,7 +1162,7 @@ def main():
             st.markdown(report)
             
             # Advanced statistics
-            st.subheader("📈 Statistical Analysis")
+            st.subheader(" Statistical Analysis")
             
             similarities = [r['Similarity'] for r in results]
             
@@ -1183,7 +1183,7 @@ def main():
                 'Similarity Score': [f"{v:.3f}" for v in perc_values]
             })
             
-            st.subheader("📊 Percentile Analysis")
+            st.subheader(" Percentile Analysis")
             st.dataframe(perc_df, use_container_width=True)
         
         else:
@@ -1194,13 +1194,13 @@ def main():
         
         if st.session_state.detector.files:
             for filename, content in st.session_state.detector.files.items():
-                with st.expander(f"📄 {filename}"):
+                with st.expander(f" {filename}"):
                     metadata = st.session_state.detector.file_metadata[filename]
                     
                     col1, col2 = st.columns([1, 2])
                     
                     with col1:
-                        st.markdown("**📊 File Statistics:**")
+                        st.markdown("** File Statistics:**")
                         st.write(f"• Size: {metadata['size']} bytes")
                         st.write(f"• Lines: {metadata['lines']}")
                         st.write(f"• Functions: {metadata['functions']}")
@@ -1209,12 +1209,12 @@ def main():
                         st.write(f"• Uploaded: {metadata['upload_time'].strftime('%H:%M:%S')}")
                         
                         if metadata['includes']:
-                            st.markdown("**📚 Includes:**")
+                            st.markdown("** Includes:**")
                             for include in metadata['includes']:
                                 st.code(include, language='cpp')
                     
                                 with col2:
-                                    st.markdown("**📄 Code Preview:**")
+                                    st.markdown("** Code Preview:**")
                                     preview_lines = content.split('\n')[:20]
                                     preview = '\n'.join(preview_lines)
                                     if len(content.split('\n')) > 20:
@@ -1226,19 +1226,19 @@ def main():
             st.info("No files uploaded yet.")
     
     with tab6:
-        st.header("📥 Export & Download Results")
+        st.header(" Export & Download Results")
         
         if results:
             col1, col2 = st.columns(2)
             
             with col1:
-                st.subheader("📊 Export Options")
+                st.subheader(" Export Options")
                 
                 # CSV Export
                 df = pd.DataFrame(results)
                 csv = df.to_csv(index=False)
                 st.download_button(
-                    label="📊 Download CSV Report",
+                    label=" Download CSV Report",
                     data=csv,
                     file_name=f"plagiarism_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
                     mime="text/csv"
@@ -1248,7 +1248,7 @@ def main():
                 import json
                 json_data = json.dumps(results, indent=2, default=str)
                 st.download_button(
-                    label="📋 Download JSON Report",
+                    label=" Download JSON Report",
                     data=json_data,
                     file_name=f"plagiarism_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
                     mime="application/json"
@@ -1259,20 +1259,20 @@ def main():
                     st.session_state.detector, results, algorithm, threshold
                 )
                 st.download_button(
-                    label="📄 Download Detailed Report",
+                    label=" Download Detailed Report",
                     data=detailed_report,
                     file_name=f"detailed_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
                     mime="text/markdown"
                 )
             
             with col2:
-                st.subheader("📈 Export Settings")
+                st.subheader(" Export Settings")
                 
                 include_metadata = st.checkbox("Include file metadata", value=True)
                 include_code_snippets = st.checkbox("Include code snippets", value=False)
                 only_suspicious = st.checkbox("Only suspicious pairs", value=False)
                 
-                if st.button("🎯 Generate Custom Report"):
+                if st.button(" Generate Custom Report"):
                     custom_results = results
                     if only_suspicious:
                         custom_results = [r for r in results if r['Status'] == 'Suspicious']
@@ -1305,7 +1305,7 @@ Total Comparisons: {len(custom_results)}
 """
                     
                     st.download_button(
-                        label="📋 Download Custom Report",
+                        label=" Download Custom Report",
                         data=custom_report,
                         file_name=f"custom_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
                         mime="text/markdown"
