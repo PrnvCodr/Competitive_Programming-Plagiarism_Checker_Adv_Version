@@ -29,149 +29,408 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom CSS for better UI (add this to your existing CSS section)
+# Enhanced CSS for beautiful UI
 st.markdown("""
 <style>
+/* Import Google Fonts - via @import in CSS */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+
+/* Base font and background */
+html, body, [class*="css"] {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+      Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
+}
+
+.main .block-container {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    min-height: 100vh;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+/* Main header styling */
+.main-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 3rem 2rem;
+    border-radius: 20px;
+    color: white;
+    text-align: center;
+    margin-bottom: 3rem;
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.main-header h1 {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: -0.02em;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.main-header p {
+    font-size: 1.4rem;
+    font-weight: 400;
+    margin-top: 1rem;
+    opacity: 0.95;
+    letter-spacing: 0.01em;
+}
+
+/* Enhanced metric card styling */
+.metric-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 2rem 2.5rem;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+    border-left: 6px solid #667eea;
+    color: #1a202c;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(102, 126, 234, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+.metric-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+}
+
+.metric-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 25px 50px rgba(102, 126, 234, 0.25);
+}
+
+.metric-card h3 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #64748b;
+    margin: 0 0 0.5rem 0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.metric-card h2 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin: 0;
+}
+
+/* Suspicious and safe cards with enhanced styling */
+.suspicious-card {
+    background: linear-gradient(135deg, #fef2f2 0%, #fecaca 20%, #fff5f5 100%);
+    border-left: 6px solid #dc2626;
+    padding: 2rem 2.5rem;
+    border-radius: 18px;
+    margin: 1rem 0;
+    color: #7f1d1d;
+    box-shadow: 0 10px 25px rgba(220, 38, 38, 0.15);
+    font-weight: 600;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+}
+
+.safe-card {
+    background: linear-gradient(135deg, #f0fdf4 0%, #bbf7d0 20%, #f0fff4 100%);
+    border-left: 6px solid #16a34a;
+    padding: 2rem 2.5rem;
+    border-radius: 18px;
+    margin: 1rem 0;
+    color: #14532d;
+    box-shadow: 0 10px 25px rgba(22, 163, 74, 0.15);
+    font-weight: 600;
+    border: 1px solid rgba(22, 163, 74, 0.2);
+}
+
+/* Enhanced tabs styling */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 8px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 0.5rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.stTabs [data-baseweb="tab"] {
+    background: transparent;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    color: #64748b !important;
+    font-weight: 600;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+}
+
+.stTabs [data-baseweb="tab"]:hover {
+    background: rgba(102, 126, 234, 0.1);
+    color: #667eea !important;
+}
+
+.stTabs [aria-selected="true"] {
+    background: linear-gradient(135deg, #667eea, #764ba2) !important;
+    color: white !important;
+    font-weight: 700;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    transform: translateY(-2px);
+}
+
+/* Enhanced button styling */
+.stButton > button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white !important;
+    border: none;
+    border-radius: 14px;
+    padding: 1rem 2.5rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-transform: none;
+    letter-spacing: 0.02em;
+}
+
+.stButton > button:hover {
+    background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+    box-shadow: 0 12px 30px rgba(90, 103, 216, 0.6);
+    transform: translateY(-3px);
+}
+
+/* Enhanced download button styling */
+.stDownloadButton > button {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+    color: white !important;
+    border: none;
+    border-radius: 14px !important;
+    padding: 1rem 2.5rem;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(16, 185, 129, 0.4);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stDownloadButton > button:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%) !important;
+    box-shadow: 0 12px 30px rgba(5, 150, 105, 0.6);
+    transform: translateY(-3px);
+}
+
+/* Enhanced dataframe styling */
+.stDataFrame {
+    background: white !important;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    padding: 1.5rem !important;
+    margin: 1.5rem 0;
+    border: 1px solid #e2e8f0;
+}
+
+.stDataFrame > div {
+    background: white !important;
+    border-radius: 12px;
+}
+
+.stDataFrame table {
+    background: white !important;
+    color: #334155 !important;
+    font-size: 1rem;
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+}
+
+.stDataFrame th {
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+    color: #475569 !important;
+    font-weight: 700;
+    border: none !important;
+    padding: 1.2rem 1.5rem !important;
+    text-align: left;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.stDataFrame th:first-child {
+    border-radius: 12px 0 0 0;
+}
+
+.stDataFrame th:last-child {
+    border-radius: 0 12px 0 0;
+}
+
+.stDataFrame td {
+    background: white !important;
+    color: #334155 !important;
+    border-bottom: 1px solid #f1f5f9 !important;
+    padding: 1.2rem 1.5rem !important;
+    font-size: 0.95rem;
+    vertical-align: middle;
+}
+
+.stDataFrame tbody tr:hover td {
+    background: #f8fafc !important;
+}
+
+/* Enhanced sidebar styling */
+.css-1d391kg {
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border-right: 1px solid #e2e8f0;
+    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Enhanced expander styling */
+.streamlit-expanderContent {
+    background: white !important;
+    color: #334155 !important;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e2e8f0;
+    padding: 2rem !important;
+}
+
+/* Enhanced code block styling */
+.stCodeBlock {
+    background: #f8fafc !important;
+    border-radius: 12px;
+    border: 1px solid #e2e8f0;
+    padding: 1.5rem !important;
+    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace !important;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Enhanced metric container styling */
+[data-testid="metric-container"] {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
+    border: 1px solid #e2e8f0 !important;
+    padding: 2rem !important;
+    border-radius: 18px !important;
+    color: #1e293b !important;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
+    transition: all 0.3s ease !important;
+}
+
+[data-testid="metric-container"]:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12) !important;
+}
+
+[data-testid="metric-container"] > div {
+    color: #1e293b !important;
+    font-weight: 600;
+}
+
+[data-testid="metric-container"] [data-testid="metric-value"] {
+    font-size: 2.5rem !important;
+    font-weight: 700 !important;
+    color: #0f172a !important;
+}
+
+[data-testid="metric-container"] [data-testid="metric-label"] {
+    font-size: 0.9rem !important;
+    font-weight: 600 !important;
+    color: #64748b !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+}
+
+/* Enhanced selectbox and input styling */
+.stSelectbox > div > div {
+    background: white;
+    border-radius: 12px;
+    border: 2px solid #e2e8f0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.stSelectbox > div > div:focus-within {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* File uploader styling */
+.stFileUploader {
+    border-radius: 16px;
+    border: 2px dashed #cbd5e1;
+    background: rgba(248, 250, 252, 0.5);
+    padding: 2rem;
+    transition: all 0.3s ease;
+}
+
+.stFileUploader:hover {
+    border-color: #667eea;
+    background: rgba(102, 126, 234, 0.05);
+}
+
+/* Footer styling */
+.footer {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    border-radius: 20px;
+    margin-top: 3rem;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+}
+
+.footer h3 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 1rem;
+}
+
+.footer p {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin: 0.5rem 0;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .main-header h1 {
+        font-size: 2.5rem;
+    }
+    
     .main-header {
-        background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-        padding: 2rem;
-        border-radius: 10px;
-        color: white;
-        text-align: center;
-        margin-bottom: 2rem;
+        padding: 2rem 1.5rem;
     }
+    
     .metric-card {
-        background: white;
-        padding: 1rem;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        border-left: 4px solid #667eea;
-    }
-    .suspicious-card {
-        background: #fff5f5;
-        border-left: 4px solid #e53e3e;
-        padding: 1rem;
-        border-radius: 10px;
-        margin: 0.5rem 0;
-    }
-    .safe-card {
-        background: #f0fff4;
-        border-left: 4px solid #38a169;
-        padding: 1rem;
-        border-radius: 10px;
-        margin: 0.5rem 0;
+        padding: 1.5rem;
     }
     
-    /* Fix for tab styling */
-    .stTabs [data-baseweb="tab-list"] {
-        gap: 2px;
-    }
     .stTabs [data-baseweb="tab"] {
-        background-color: #f0f2f6;
-        border-radius: 10px 10px 0 0;
-        padding: 0.5rem 1rem;
-        color: #333333 !important;
-        font-weight: 500;
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
     }
-    .stTabs [aria-selected="true"] {
-        background-color: #667eea !important;
-        color: white !important;
-        font-weight: 600;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
     }
-    
-    /* Fix for button styling */
-    .stButton > button {
-        background-color: #667eea;
-        color: white !important;
-        border: none;
-        border-radius: 8px;
-        padding: 0.5rem 1rem;
-        font-weight: 500;
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
-    .stButton > button:hover {
-        background-color: #5a67d8;
-        color: white !important;
-    }
-    
-    /* Fix for download button styling */
-    .stDownloadButton > button {
-        background-color: #38a169 !important;
-        color: white !important;
-        border: none;
-        border-radius: 8px;
-        padding: 0.5rem 1rem;
-        font-weight: 500;
-    }
-    
-    /* Fix for dataframe styling - IMPORTANT FOR RESULTS VISIBILITY */
-    .stDataFrame {
-        background-color: white !important;
-    }
-    
-    .stDataFrame > div {
-        background-color: white !important;
-    }
-    
-    /* Fix dataframe table styling */
-    .stDataFrame table {
-        background-color: white !important;
-        color: #333333 !important;
-    }
-    
-    .stDataFrame th {
-        background-color: #f8f9fa !important;
-        color: #333333 !important;
-        font-weight: 600;
-        border-bottom: 2px solid #dee2e6 !important;
-    }
-    
-    .stDataFrame td {
-        background-color: white !important;
-        color: #333333 !important;
-        border-bottom: 1px solid #dee2e6 !important;
-    }
-    
-    /* Fix for styled dataframe */
-    .stDataFrame [data-testid="stDataFrame"] {
-        background-color: white !important;
-    }
-    
-    /* Ensure text is visible in all elements */
-    .stMarkdown, .stText {
-        color: #2d3748 !important;
-    }
-    
-    /* Fix metric containers */
-    [data-testid="metric-container"] {
-        background-color: white !important;
-        border: 1px solid #e2e8f0 !important;
-        padding: 1rem !important;
-        border-radius: 10px !important;
-        color: #333333 !important;
-    }
-    
-    [data-testid="metric-container"] > div {
-        color: #333333 !important;
-    }
-    
-    /* Fix for expander content */
-    .streamlit-expanderContent {
-        background-color: white !important;
-        color: #333333 !important;
-    }
-    
-    /* Fix for code blocks */
-    .stCodeBlock {
-        background-color: #f8f9fa !important;
-    }
-    
-    /* Fix for any remaining dark backgrounds */
-    .main .block-container {
-        background-color: white !important;
-    }
+}
+
+.metric-card, .suspicious-card, .safe-card {
+    animation: fadeInUp 0.6s ease-out;
+}
 </style>
 """, unsafe_allow_html=True)
 
+# Your existing CompetitiveProgrammingPlagiarismDetector class remains unchanged
 class CompetitiveProgrammingPlagiarismDetector:
     def __init__(self):
         self.files = {}
@@ -408,7 +667,6 @@ class CompetitiveProgrammingPlagiarismDetector:
         
         return dot_product / (magnitude1 * magnitude2)
 
-    
     def calculate_similarity(self, file1, file2, algorithm):
         """Calculate similarity using specified algorithm"""
         code1, code2 = self.files[file1], self.files[file2]
@@ -517,7 +775,7 @@ class CompetitiveProgrammingPlagiarismDetector:
         union = len(tokens1.union(tokens2))
         
         return intersection / union if union > 0 else 0
-    
+
     def cosine_similarity(self, code1, code2):
         """Cosine similarity using TF-IDF"""
         proc1 = self.preprocess_cpp_code(code1)
@@ -614,6 +872,9 @@ class CompetitiveProgrammingPlagiarismDetector:
                 })
         
         return sorted(results, key=lambda x: x['Similarity'], reverse=True)
+
+# All your existing visualization and main functions remain unchanged...
+# [Rest of your code continues exactly as before]
 
 def create_advanced_visualizations(detector, results, algorithm):
     """Create advanced visualizations"""
@@ -1002,7 +1263,7 @@ def main():
                 st.subheader("Similarity Score Distribution")
                 st.plotly_chart(fig_dist, use_container_width=True)
             
-            # Network graph for high similarities - FIXED VERSION
+            # Network graph for high similarities
             st.subheader("Similarity Network")
             high_sim_results = [r for r in results if r['Similarity'] >= threshold]
             
@@ -1057,12 +1318,10 @@ def main():
                                                 color='lightblue',
                                                 line=dict(width=2, color='black')))
                 
-                # FIXED: Create figure first, then update layout
                 fig_network = go.Figure()
                 fig_network.add_trace(edge_trace)
                 fig_network.add_trace(node_trace)
                 
-                # Update layout separately
                 fig_network.update_layout(
                     title=dict(
                         text='Similarity Network (Above Threshold)',
@@ -1075,7 +1334,6 @@ def main():
                     yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)
                 )
                 
-                # Add annotation separately
                 fig_network.add_annotation(
                     text="Connections show similarities above threshold",
                     showarrow=False,
@@ -1116,7 +1374,7 @@ def main():
                 for i, (alg, sim) in enumerate(similarities.items()):
                     with cols[i % 3]:
                         color = "Red" if sim >= 0.8 else "Yellow" if sim >= 0.6 else "Green"
-                        st.metric(f"{color} {alg}", f"{sim:.3f}", f"{sim*100:.1f}%")
+                        st.metric(f"{alg}", f"{sim:.3f}", f"{sim*100:.1f}%")
                 
                 # File metadata comparison
                 st.subheader("File Metadata Comparison")
@@ -1323,10 +1581,9 @@ Total Comparisons: {len(custom_results)}
         else:
             st.info("No results available for export.")
     
-    # Footer
-    st.markdown("---")
+    # Enhanced Footer
     st.markdown("""
-    <div style="text-align: center; color: #666; padding: 2rem;">
+    <div class="footer">
         <h3>Competitive Programming Plagiarism Checker</h3>
         <p>Advanced C++ code similarity detection with 12 sophisticated algorithms</p>
         <p>Built for competitive programming • Optimized for accuracy • Enhanced UI</p>
