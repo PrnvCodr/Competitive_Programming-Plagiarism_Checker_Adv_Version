@@ -538,7 +538,7 @@ class CompetitiveProgrammingPlagiarismDetector:
         
         # Extract just the structure types - FIXED
         struct1 = [item[0] for item in cf1]
-        struct2 = [item for item in cf2]  # FIXED: was [item for item in cf2]
+        struct2 = [item[0] for item in cf2]  # FIXED: was [item for item in cf2]
         
         return self.sequence_similarity(struct1, struct2)
     
@@ -830,7 +830,7 @@ def create_enhanced_similarity_matrix(detector, results, algorithm):
     
     # FIXED: Use proper title format
     fig.update_layout(
-        title=dict(text=f"📊 Enhanced Similarity Matrix - {algorithm}", font=dict(size=16)),
+        title=dict(text=f"Enhanced Similarity Matrix - {algorithm}", font=dict(size=16)),
         xaxis_title="Files",
         yaxis_title="Files",
         margin=dict(t=80, b=40, l=40, r=40)
@@ -899,7 +899,7 @@ def create_risk_gauges(results):
     # FIXED: Use proper title format
     fig.update_layout(
         height=500, 
-        title=dict(text="⚡ Risk Assessment Gauges", font=dict(size=16)),
+        title=dict(text="Risk Assessment Gauges", font=dict(size=16)),
         margin=dict(t=80, b=40, l=40, r=40)
     )
     return fig
@@ -945,7 +945,7 @@ def create_file_complexity_radar(detector):
                 range=[0, 100]
             )),
         showlegend=True,
-        title=dict(text="🎯 File Complexity Analysis", font=dict(size=16)),
+        title=dict(text="File Complexity Analysis", font=dict(size=16)),
         margin=dict(t=80, b=40, l=40, r=40)
     )
     
@@ -989,7 +989,7 @@ def create_similarity_trends(results):
     
     # FIXED: Use proper title format
     fig.update_layout(
-        title=dict(text="📈 Similarity Trend Analysis", font=dict(size=16)),
+        title=dict(text="Similarity Trend Analysis", font=dict(size=16)),
         xaxis_title="File Pairs",
         yaxis_title="Similarity Percentage",
         xaxis=dict(
@@ -1054,7 +1054,7 @@ def create_algorithm_comparison_sunburst(detector, file_pairs):
     
     # FIXED: Use proper title format
     fig.update_layout(
-        title=dict(text="☀️ Algorithm Performance Sunburst", font=dict(size=16)),
+        title=dict(text="Algorithm Performance Sunburst", font=dict(size=16)),
         height=600,
         margin=dict(t=80, b=40, l=40, r=40)
     )
@@ -1106,7 +1106,7 @@ def create_statistics_dashboard(detector, results):
     # FIXED: Use proper title format
     fig.update_layout(
         height=700, 
-        title=dict(text="📊 Comprehensive Statistics Dashboard", font=dict(size=16)),
+        title=dict(text="Comprehensive Statistics Dashboard", font=dict(size=16)),
         margin=dict(t=80, b=40, l=40, r=40)
     )
     
@@ -1123,7 +1123,7 @@ def create_enhanced_metrics(results):
     with col1:
         st.markdown(f"""
         <div class="metric-card">
-            <h3>📊 Total Comparisons</h3>
+            <h3>Total Comparisons</h3>
             <h2>{len(results)}</h2>
             <div style="width: 100%; background-color: #e2e8f0; border-radius: 10px; height: 8px; margin-top: 10px;">
                 <div style="width: 100%; background: linear-gradient(90deg, #667eea, #764ba2); height: 8px; border-radius: 10px;"></div>
@@ -1135,7 +1135,7 @@ def create_enhanced_metrics(results):
         danger_width = (suspicious_count / len(results)) * 100 if results else 0
         st.markdown(f"""
         <div class="metric-card">
-            <h3>⚠️ Suspicious Pairs</h3>
+            <h3>Suspicious Pairs</h3>
             <h2>{suspicious_count}</h2>
             <div style="width: 100%; background-color: #e2e8f0; border-radius: 10px; height: 8px; margin-top: 10px;">
                 <div style="width: {danger_width}%; background: linear-gradient(90deg, #dc2626, #ef4444); height: 8px; border-radius: 10px;"></div>
@@ -1147,7 +1147,7 @@ def create_enhanced_metrics(results):
         avg_width = avg_similarity * 100
         st.markdown(f"""
         <div class="metric-card">
-            <h3>📈 Average Similarity</h3>
+            <h3>Average Similarity</h3>
             <h2>{avg_similarity * 100:.1f}%</h2>
             <div style="width: 100%; background-color: #e2e8f0; border-radius: 10px; height: 8px; margin-top: 10px;">
                 <div style="width: {avg_width}%; background: linear-gradient(90deg, #10b981, #059669); height: 8px; border-radius: 10px;"></div>
@@ -1159,7 +1159,7 @@ def create_enhanced_metrics(results):
         max_width = max_similarity * 100
         st.markdown(f"""
         <div class="metric-card">
-            <h3>🔥 Highest Similarity</h3>
+            <h3>Highest Similarity</h3>
             <h2>{max_similarity * 100:.1f}%</h2>
             <div style="width: 100%; background-color: #e2e8f0; border-radius: 10px; height: 8px; margin-top: 10px;">
                 <div style="width: {max_width}%; background: linear-gradient(90deg, #f59e0b, #d97706); height: 8px; border-radius: 10px;"></div>
@@ -1210,7 +1210,7 @@ def main():
     # Header
     st.markdown("""
     <div class="main-header">
-        <h1>🚀 Competitive Programming Plagiarism Checker</h1>
+        <h1>Competitive Programming Plagiarism Checker</h1>
         <p>Advanced C++ Code Similarity Detection for Competitive Programming</p>
     </div>
     """, unsafe_allow_html=True)
@@ -1221,10 +1221,10 @@ def main():
     
     # Sidebar
     with st.sidebar:
-        st.header("⚙️ Configuration Panel")
+        st.header("Configuration Panel")
         
         # File upload section
-        st.subheader("📁 Upload C++ Files")
+        st.subheader("Upload C++ Files")
         uploaded_files = st.file_uploader(
             "Choose C++ files",
             type=['cpp', 'cc', 'cxx', 'c'],
@@ -1233,7 +1233,7 @@ def main():
         )
         
         # Bulk upload option
-        st.subheader("📦 Bulk Upload (ZIP)")
+        st.subheader("Bulk Upload (ZIP)")
         zip_file = st.file_uploader(
             "Upload ZIP file containing C++ files",
             type=['zip'],
@@ -1241,7 +1241,7 @@ def main():
         )
         
         # Algorithm selection
-        st.subheader("🔍 Detection Algorithm")
+        st.subheader("Detection Algorithm")
         algorithm = st.selectbox(
             "Select Algorithm",
             st.session_state.detector.algorithms,
@@ -1250,7 +1250,7 @@ def main():
         )
         
         # Advanced settings
-        st.subheader("⚙️ Advanced Settings")
+        st.subheader("Advanced Settings")
         threshold = st.slider(
             "Similarity Threshold",
             min_value=0.0,
@@ -1275,7 +1275,7 @@ def main():
         )
         
         # Analysis options
-        st.subheader("🎛️ Analysis Options")
+        st.subheader("Analysis Options")
         ignore_includes = st.checkbox("Ignore #include statements", value=True)
         ignore_comments = st.checkbox("Ignore comments", value=True)
         normalize_whitespace = st.checkbox("Normalize whitespace", value=True)
@@ -1394,12 +1394,12 @@ def main():
     
     # Main analysis tabs
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "📊 Analysis Results", 
-        "📈 Enhanced Visualizations", 
-        "🔍 Code Comparison", 
-        "📄 Detailed Report",
-        "📂 File Explorer",
-        "💾 Export Results"
+        "Analysis Results", 
+        "Enhanced Visualizations", 
+        "Code Comparison", 
+        "Detailed Report",
+        "File Explorer",
+        "Export Results"
     ])
     
     # Calculate results
@@ -1407,7 +1407,7 @@ def main():
         results = st.session_state.detector.compare_all_files(algorithm, threshold)
     
     with tab1:
-        st.header("🎯 Plagiarism Analysis Results")
+        st.header("Plagiarism Analysis Results")
         
         if results:
             # Enhanced summary metrics
@@ -1433,7 +1433,7 @@ def main():
             st.dataframe(styled_df, use_container_width=True, height=400)
             
             # Top suspicious pairs
-            st.subheader("🚨 Most Suspicious Pairs")
+            st.subheader("Most Suspicious Pairs")
             top_suspicious = [r for r in results if r['Similarity'] >= 0.7][:5]
             
             for result in top_suspicious:
@@ -1453,33 +1453,33 @@ def main():
             st.info("No results to display.")
     
     with tab2:
-        st.header("📊 Enhanced Visualizations Dashboard")
+        st.header("Enhanced Visualizations Dashboard")
         
         if results and len(results) > 0:
             # Enhanced similarity matrix
-            st.subheader("🔥 Enhanced Interactive Similarity Matrix")
+            st.subheader("Enhanced Interactive Similarity Matrix")
             fig_enhanced_matrix = create_enhanced_similarity_matrix(
                 st.session_state.detector, results, algorithm
             )
             st.plotly_chart(fig_enhanced_matrix, use_container_width=True)
             
             # Risk assessment gauges
-            st.subheader("⚡ Risk Assessment Gauges")
+            st.subheader("Risk Assessment Gauges")
             fig_gauges = create_risk_gauges(results)
             st.plotly_chart(fig_gauges, use_container_width=True)
             
             # File complexity radar
-            st.subheader("🎯 File Complexity Analysis")
+            st.subheader("File Complexity Analysis")
             fig_radar = create_file_complexity_radar(st.session_state.detector)
             st.plotly_chart(fig_radar, use_container_width=True)
             
             # Similarity trends
-            st.subheader("📈 Similarity Trend Analysis")
+            st.subheader("Similarity Trend Analysis")
             fig_trends = create_similarity_trends(results)
             st.plotly_chart(fig_trends, use_container_width=True)
             
             # Algorithm comparison sunburst
-            st.subheader("☀️ Algorithm Performance Sunburst")
+            st.subheader("Algorithm Performance Sunburst")
             file_pairs = [(r['File 1'], r['File 2']) for r in results[:10]]  # Top 10 pairs
             fig_sunburst = create_algorithm_comparison_sunburst(
                 st.session_state.detector, file_pairs
@@ -1487,14 +1487,14 @@ def main():
             st.plotly_chart(fig_sunburst, use_container_width=True)
             
             # Statistics dashboard
-            st.subheader("📊 Comprehensive Statistics Dashboard")
+            st.subheader("Comprehensive Statistics Dashboard")
             fig_dashboard = create_statistics_dashboard(
                 st.session_state.detector, results
             )
             st.plotly_chart(fig_dashboard, use_container_width=True)
             
             # Network graph for high similarities
-            st.subheader("🕸️ Similarity Network Graph")
+            st.subheader("Similarity Network Graph")
             high_sim_results = [r for r in results if r['Similarity'] >= threshold]
             
             if high_sim_results:
@@ -1560,7 +1560,7 @@ def main():
                 fig_network = go.Figure(
                     data=[edge_trace, node_trace],
                     layout=go.Layout(
-                        title=dict(text="🕸️ Similarity Network Graph", font=dict(size=16)),
+                        title=dict(text="Similarity Network Graph", font=dict(size=16)),
                         showlegend=False,
                         hovermode="closest",
                         margin=dict(b=20, l=5, r=5, t=40),
@@ -1581,7 +1581,7 @@ def main():
 
     # ------------- TAB 3 — CODE COMPARISON -----------------
     with tab3:
-        st.header("🔍 Code Comparison")
+        st.header("Code Comparison")
 
         if len(st.session_state.detector.files) >= 2:
             c1, c2 = st.columns(2)
@@ -1595,7 +1595,7 @@ def main():
                                      key="file2_select")
 
             if file1 and file2 and file1 != file2:
-                st.subheader(f"📋 {file1} ↔ {file2}")
+                st.subheader(f"{file1} ↔ {file2}")
 
                 algo_rows = []
                 for algo in st.session_state.detector.algorithms:
@@ -1621,13 +1621,13 @@ def main():
 
     # ------------- TAB 4 — DETAILED REPORT -----------------
     with tab4:
-        st.header("📄 Detailed Report")
+        st.header("Detailed Report")
         if results:
             md_report = generate_detailed_report(st.session_state.detector,
                                                  results, algorithm, threshold)
             st.markdown(md_report)
             st.download_button(
-                "📥 Download Report (Markdown)",
+                "Download Report (Markdown)",
                 md_report,
                 file_name=f"plagiarism_report_{datetime.now():%Y%m%d_%H%M%S}.md",
                 mime="text/markdown")
@@ -1636,7 +1636,7 @@ def main():
 
     # ------------- TAB 5 — FILE EXPLORER -------------------
     with tab5:
-        st.header("📂 File Explorer")
+        st.header("File Explorer")
         if st.session_state.detector.files:
             explorer_df = pd.DataFrame([
                 dict(Filename=f,
@@ -1653,7 +1653,7 @@ def main():
                                      list(st.session_state.detector.files.keys()))
             st.code(st.session_state.detector.files[view_file], language="cpp")
 
-            if st.button("🗑️ Clear All Files"):
+            if st.button("Clear All Files"):
                 st.session_state.detector = CompetitiveProgrammingPlagiarismDetector()
                 st.success("Cleared; reload to start fresh.")
                 st.rerun()
@@ -1662,10 +1662,10 @@ def main():
 
     # ------------- TAB 6 — EXPORT RESULTS ------------------
     with tab6:
-        st.header("💾 Export Results")
+        st.header("Export Results")
         if results:
             data_df = pd.DataFrame(results)
-            st.download_button("📊 Download CSV",
+            st.download_button("Download CSV",
                                data_df.to_csv(index=False),
                                file_name="results.csv",
                                mime="text/csv")
