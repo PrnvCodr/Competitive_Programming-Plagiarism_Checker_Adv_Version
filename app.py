@@ -24,7 +24,7 @@ import os
 # Configure Streamlit page
 st.set_page_config(
     page_title="Competitive Programming Plagiarism Checker",
-    page_icon="⚡",
+    page_icon="",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -430,7 +430,7 @@ html, body, [class*="css"] {
 </style>
 """, unsafe_allow_html=True)
 
-# Your existing CompetitiveProgrammingPlagiarismDetector class remains unchanged
+# Your existing CompetitiveProgrammingPlagiarismDetector class
 class CompetitiveProgrammingPlagiarismDetector:
     def __init__(self):
         self.files = {}
@@ -559,7 +559,7 @@ class CompetitiveProgrammingPlagiarismDetector:
         for i in range(len(kgrams) - w + 1):
             window = kgrams[i:i+w]
             min_hash = min(window, key=lambda x: x[1])
-            fingerprints.add((min_hash[0], min_hash[1]))
+            fingerprints.add((min_hash, min_hash[1]))
         
         return fingerprints
     
@@ -622,13 +622,13 @@ class CompetitiveProgrammingPlagiarismDetector:
         return lcs_length / max(m, n)
     
     def control_flow_similarity(self, cf1, cf2):
-        """Compare control flow structures"""
+        """Compare control flow structures - FIXED BUG"""
         if not cf1 or not cf2:
             return 0
         
         # Extract just the structure types
         struct1 = [item[0] for item in cf1]
-        struct2 = [item[0] for item in cf2]
+        struct2 = [item for item in cf2]  # FIXED: was [item for item in cf2]
         
         return self.sequence_similarity(struct1, struct2)
     
@@ -873,8 +873,384 @@ class CompetitiveProgrammingPlagiarismDetector:
         
         return sorted(results, key=lambda x: x['Similarity'], reverse=True)
 
-# All your existing visualization and main functions remain unchanged...
-# [Rest of your code continues exactly as before]
+# Enhanced visualization functions
+def create_enhanced_similarity_matrix(detector, results, algorithm):
+    """Create enhanced interactive similarity matrix with annotations"""
+    filenames = list(detector.files.keys())
+    n = len(filenames)
+    matrix = np.zeros((n, n))
+    
+    for i in range(n):
+        for j in range(n):
+            if i == j:
+                matrix[i][j] = 1.0
+            elif i < j:
+                similarity = detector.calculate_similarity(filenames[i], filenames[j], algorithm)
+                matrix[i][j] = similarity
+                matrix[j][i] = similarity
+    
+    # Create annotations matrix for text display
+    annotation_matrix = []
+    for i in range(n):
+        row = []
+        for j in range(n):
+            if i == j:
+                row.append("SAME")
+            else:
+                row.append(f"{matrix[i][j]:.3f}")
+        annotation_matrix.append(row)
+    
+    fig = go.Figure(data=go.Heatmap(
+        z=matrix,
+        x=filenames,
+        y=filenames,
+        colorscale=[
+            [0, '#2d5016'],      # Dark green for low similarity
+            [0.3, '#65a30d'],    # Medium green
+            [0.5, '#facc15'],    # Yellow for medium similarity
+            [0.7, '#f97316'],    # Orange for high similarity
+            [1, '#dc2626']       # Red for very high similarity
+        ],
+        text=annotation_matrix,
+        texttemplate="%{text}",
+        textfont={"size": 12, "color": "white"},
+        hoverongaps=False,
+        hovertemplate='<b>%{y}</b> vs <b>%{x}</b><br>Similarity: %{z:.3f}<extra></extra>'
+    ))
+    
+    fig.update_layout(
+        title=f" Enhanced Similarity Matrix - {algorithm}",
+        title_font_size=16,
+        xaxis_title="Files",
+        yaxis_title="Files",
+        margin=dict(t=80, b=40, l=40, r=40)
+    )
+    
+    return fig
+
+def create_risk_gauges(results):
+    """Create individual gauge charts for top risky pairs"""
+    top_risks = sorted(results, key=lambda x: x['Similarity'], reverse=True)[:6]
+    
+    if len(top_risks) < 6:
+        # Fill with empty data if we have fewer than 6 results
+        while len(top_risks) < 6:
+            top_risks.append({
+                'File 1': 'No Data',
+                'File 2': 'No Data',
+                'Similarity': 0,
+                'Percentage': '0.00%'
+            })
+    
+    fig = make_subplots(
+        rows=2, cols=3,
+        subplot_titles=[f"{r['File 1'][:10]}... vs {r['File 2'][:10]}..." for r in top_risks],
+        specs=[[{"type": "indicator"}, {"type": "indicator"}, {"type": "indicator"}],
+               [{"type": "indicator"}, {"type": "indicator"}, {"type": "indicator"}]]
+    )
+    
+    positions = [(1,1), (1,2), (1,3), (2,1), (2,2), (2,3)]
+    
+    for i, (result, pos) in enumerate(zip(top_risks, positions)):
+        similarity_percent = result['Similarity'] * 100
+        
+        # Determine color based on risk
+        if similarity_percent >= 80:
+            color = "red"
+        elif similarity_percent >= 60:
+            color = "orange"
+        elif similarity_percent >= 40:
+            color = "yellow"
+        else:
+            color = "green"
+        
+        fig.add_trace(go.Indicator(
+            mode = "gauge+number",
+            value = similarity_percent,
+            title = {'text': f"Similarity %"},
+            domain = {'x': [0, 1], 'y': [0, 1]},
+            gauge = {
+                'axis': {'range': [None, 100]},
+                'bar': {'color': color},
+                'steps': [
+                    {'range': [0, 40], 'color': "lightgray"},
+                    {'range': [40, 60], 'color': "lightyellow"},
+                    {'range': [60, 80], 'color': "lightcoral"},
+                    {'range': [80, 100], 'color': "lightpink"}
+                ],
+                'threshold': {
+                    'line': {'color': "black", 'width': 4},
+                    'thickness': 0.75,
+                    'value': 90
+                }
+            }
+        ), row=pos[0], col=pos[1])
+    
+    fig.update_layout(
+        height=500, 
+        title=" Risk Assessment Gauges",
+        margin=dict(t=80, b=40, l=40, r=40)
+    )
+    return fig
+
+def create_file_complexity_radar(detector):
+    """Create radar chart showing file complexity metrics"""
+    files = list(detector.files.keys())
+    
+    fig = go.Figure()
+    
+    for filename in files[:5]:  # Show top 5 files
+        metadata = detector.file_metadata[filename]
+        
+        # Normalize metrics for radar chart
+        max_lines = max([m['lines'] for m in detector.file_metadata.values()])
+        max_functions = max([m['functions'] for m in detector.file_metadata.values()])
+        max_complexity = max([m['complexity'] for m in detector.file_metadata.values()])
+        max_size = max([m['size'] for m in detector.file_metadata.values()])
+        max_includes = max([len(m['includes']) for m in detector.file_metadata.values()])
+        
+        # Normalize to 0-100 scale
+        normalized_metrics = [
+            (metadata['lines'] / max_lines * 100) if max_lines > 0 else 0,
+            (metadata['functions'] / max_functions * 100) if max_functions > 0 else 0,
+            (metadata['complexity'] / max_complexity * 100) if max_complexity > 0 else 0,
+            (metadata['size'] / max_size * 100) if max_size > 0 else 0,
+            (len(metadata['includes']) / max_includes * 100) if max_includes > 0 else 0
+        ]
+        
+        fig.add_trace(go.Scatterpolar(
+            r=normalized_metrics + [normalized_metrics[0]],  # Close the shape
+            theta=['Lines of Code', 'Functions', 'Complexity', 'File Size', 'Includes', 'Lines of Code'],
+            fill='toself',
+            name=filename[:15] + "..." if len(filename) > 15 else filename,
+            opacity=0.7
+        ))
+    
+    fig.update_layout(
+        polar=dict(
+            radialaxis=dict(
+                visible=True,
+                range=[0, 100]
+            )),
+        showlegend=True,
+        title=" File Complexity Analysis",
+        margin=dict(t=80, b=40, l=40, r=40)
+    )
+    
+    return fig
+
+def create_similarity_trends(results):
+    """Create similarity trend analysis"""
+    # Sort results by average file size or alphabetically
+    sorted_results = sorted(results, key=lambda x: (x['File 1'], x['File 2']))
+    
+    x_labels = [f"{r['File 1'][:8]}...vs...{r['File 2'][:8]}..." for r in sorted_results]
+    similarities = [r['Similarity'] * 100 for r in sorted_results]
+    
+    # Create colors based on risk levels
+    colors = []
+    for sim in similarities:
+        if sim >= 80:
+            colors.append('red')
+        elif sim >= 60:
+            colors.append('orange')
+        elif sim >= 40:
+            colors.append('yellow')
+        else:
+            colors.append('green')
+    
+    fig = go.Figure()
+    
+    # Add line plot
+    fig.add_trace(go.Scatter(
+        x=list(range(len(x_labels))),
+        y=similarities,
+        mode='lines+markers',
+        name='Similarity Trend',
+        line=dict(color='blue', width=2),
+        marker=dict(size=8, color=colors, line=dict(color='black', width=1))
+    ))
+    
+    # Add threshold line
+    fig.add_hline(y=50, line_dash="dash", line_color="red", 
+                  annotation_text="Threshold (50%)")
+    
+    fig.update_layout(
+        title=" Similarity Trend Analysis",
+        xaxis_title="File Pairs",
+        yaxis_title="Similarity Percentage",
+        xaxis=dict(
+            tickmode='array',
+            tickvals=list(range(len(x_labels))),
+            ticktext=x_labels,
+            tickangle=45
+        ),
+        height=500,
+        margin=dict(t=80, b=100, l=40, r=40)
+    )
+    
+    return fig
+
+def create_algorithm_comparison_sunburst(detector, file_pairs):
+    """Create sunburst chart comparing algorithm results"""
+    algorithms = detector.algorithms[:6]  # Top 6 algorithms
+    
+    data = []
+    
+    # Calculate average similarities for each algorithm
+    for algorithm in algorithms:
+        avg_similarity = 0
+        count = 0
+        
+        for file1, file2 in file_pairs:
+            similarity = detector.calculate_similarity(file1, file2, algorithm)
+            avg_similarity += similarity
+            count += 1
+        
+        avg_similarity = avg_similarity / count if count > 0 else 0
+        
+        # Categorize performance
+        if avg_similarity >= 0.7:
+            category = "High Detection"
+        elif avg_similarity >= 0.4:
+            category = "Medium Detection"
+        else:
+            category = "Low Detection"
+        
+        data.append({
+            'ids': algorithm,
+            'labels': algorithm,
+            'parents': "",
+            'values': avg_similarity * 100
+        })
+        
+        data.append({
+            'ids': f"{algorithm}-{category}",
+            'labels': f"{avg_similarity*100:.1f}%",
+            'parents': algorithm,
+            'values': avg_similarity * 100
+        })
+    
+    fig = go.Figure(go.Sunburst(
+        ids=[d['ids'] for d in data],
+        labels=[d['labels'] for d in data],
+        parents=[d['parents'] for d in data],
+        values=[d['values'] for d in data],
+        branchvalues="total"
+    ))
+    
+    fig.update_layout(
+        title=" Algorithm Performance Sunburst",
+        height=600,
+        margin=dict(t=80, b=40, l=40, r=40)
+    )
+    
+    return fig
+
+def create_statistics_dashboard(detector, results):
+    """Create comprehensive statistics dashboard"""
+    fig = make_subplots(
+        rows=2, cols=2,
+        subplot_titles=['File Size Distribution', 'Complexity vs Lines', 
+                       'Risk Level Pie Chart', 'Similarity Distribution'],
+        specs=[[{"type": "histogram"}, {"type": "scatter"}],
+               [{"type": "pie"}, {"type": "histogram"}]]
+    )
+    
+    # File size distribution
+    file_sizes = [metadata['size'] for metadata in detector.file_metadata.values()]
+    fig.add_trace(go.Histogram(x=file_sizes, name="File Sizes"), row=1, col=1)
+    
+    # Complexity vs Lines scatter
+    complexities = [metadata['complexity'] for metadata in detector.file_metadata.values()]
+    lines = [metadata['lines'] for metadata in detector.file_metadata.values()]
+    filenames = list(detector.file_metadata.keys())
+    
+    fig.add_trace(go.Scatter(
+        x=lines, y=complexities, mode='markers+text',
+        text=[f[:8] + "..." if len(f) > 8 else f for f in filenames],
+        textposition="top center",
+        name="Complexity vs Lines"
+    ), row=1, col=2)
+    
+    # Risk level pie chart
+    risk_counts = {}
+    for result in results:
+        risk = result['Risk Level']
+        risk_counts[risk] = risk_counts.get(risk, 0) + 1
+    
+    fig.add_trace(go.Pie(
+        labels=list(risk_counts.keys()),
+        values=list(risk_counts.values()),
+        name="Risk Levels"
+    ), row=2, col=1)
+    
+    # Similarity distribution
+    similarities = [r['Similarity'] * 100 for r in results]
+    fig.add_trace(go.Histogram(x=similarities, name="Similarities"), row=2, col=2)
+    
+    fig.update_layout(
+        height=700, 
+        title=" Comprehensive Statistics Dashboard",
+        margin=dict(t=80, b=40, l=40, r=40)
+    )
+    
+    return fig
+
+def create_enhanced_metrics(results):
+    """Enhanced metric cards with visual indicators"""
+    suspicious_count = sum(1 for r in results if r['Status'] == 'Suspicious')
+    avg_similarity = np.mean([r['Similarity'] for r in results])
+    max_similarity = max([r['Similarity'] for r in results])
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.markdown(f"""
+        <div class="metric-card">
+            <h3> Total Comparisons</h3>
+            <h2>{len(results)}</h2>
+            <div style="width: 100%; background-color: #e2e8f0; border-radius: 10px; height: 8px; margin-top: 10px;">
+                <div style="width: 100%; background: linear-gradient(90deg, #667eea, #764ba2); height: 8px; border-radius: 10px;"></div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col2:
+        danger_width = (suspicious_count / len(results)) * 100 if results else 0
+        st.markdown(f"""
+        <div class="metric-card">
+            <h3> Suspicious Pairs</h3>
+            <h2>{suspicious_count}</h2>
+            <div style="width: 100%; background-color: #e2e8f0; border-radius: 10px; height: 8px; margin-top: 10px;">
+                <div style="width: {danger_width}%; background: linear-gradient(90deg, #dc2626, #ef4444); height: 8px; border-radius: 10px;"></div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col3:
+        avg_width = avg_similarity * 100
+        st.markdown(f"""
+        <div class="metric-card">
+            <h3> Average Similarity</h3>
+            <h2>{avg_similarity * 100:.1f}%</h2>
+            <div style="width: 100%; background-color: #e2e8f0; border-radius: 10px; height: 8px; margin-top: 10px;">
+                <div style="width: {avg_width}%; background: linear-gradient(90deg, #10b981, #059669); height: 8px; border-radius: 10px;"></div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
+    
+    with col4:
+        max_width = max_similarity * 100
+        st.markdown(f"""
+        <div class="metric-card">
+            <h3> Highest Similarity</h3>
+            <h2>{max_similarity * 100:.1f}%</h2>
+            <div style="width: 100%; background-color: #e2e8f0; border-radius: 10px; height: 8px; margin-top: 10px;">
+                <div style="width: {max_width}%; background: linear-gradient(90deg, #f59e0b, #d97706); height: 8px; border-radius: 10px;"></div>
+            </div>
+        </div>
+        """, unsafe_allow_html=True)
 
 def create_advanced_visualizations(detector, results, algorithm):
     """Create advanced visualizations"""
@@ -903,7 +1279,7 @@ def create_advanced_visualizations(detector, results, algorithm):
         title=f'Similarity Matrix - {algorithm}',
         labels=dict(color="Similarity Score")
     )
-    fig_heatmap.update_layout(width=800, height=600)
+    fig_heatmap.update_layout(margin=dict(t=80, b=40, l=40, r=40))
     
     # 2. Risk Distribution
     risk_counts = Counter([r['Risk Level'] for r in results])
@@ -918,6 +1294,7 @@ def create_advanced_visualizations(detector, results, algorithm):
             "Safe": "#38a169"
         }
     )
+    fig_risk.update_layout(margin=dict(t=80, b=40, l=40, r=40))
     
     # 3. Similarity Score Distribution
     similarities = [r['Similarity'] for r in results]
@@ -929,6 +1306,7 @@ def create_advanced_visualizations(detector, results, algorithm):
     )
     fig_dist.add_vline(x=0.5, line_dash="dash", line_color="red", 
                        annotation_text="Threshold")
+    fig_dist.update_layout(margin=dict(t=80, b=40, l=40, r=40))
     
     return fig_heatmap, fig_risk, fig_dist
 
@@ -1079,39 +1457,50 @@ def main():
                             mock_file = MockFile(file_info.filename, content, file_info.file_size)
                             files_to_process.append(mock_file)
         
-        # Process all files
+        # Process all files with progress bar
         processed_count = 0
         skipped_count = 0
         
-        for uploaded_file in files_to_process:
-            try:
-                if hasattr(uploaded_file, 'read'):
-                    content = uploaded_file.read().decode('utf-8', errors='ignore')
-                else:
-                    content = uploaded_file.content
-                
-                file_size = len(content.encode('utf-8'))
-                
-                # File validation
-                if file_size < min_file_size:
-                    st.sidebar.warning(f"Warning: {uploaded_file.name} too small ({file_size} bytes)")
+        if files_to_process:
+            progress_bar = st.progress(0)
+            status_text = st.empty()
+            
+            for idx, uploaded_file in enumerate(files_to_process):
+                try:
+                    progress = (idx + 1) / len(files_to_process)
+                    progress_bar.progress(progress)
+                    status_text.text(f'Processing {uploaded_file.name}...')
+                    
+                    if hasattr(uploaded_file, 'read'):
+                        content = uploaded_file.read().decode('utf-8', errors='ignore')
+                    else:
+                        content = uploaded_file.content
+                    
+                    file_size = len(content.encode('utf-8'))
+                    
+                    # File validation
+                    if file_size < min_file_size:
+                        st.sidebar.warning(f"Warning: {uploaded_file.name} too small ({file_size} bytes)")
+                        skipped_count += 1
+                        continue
+                    elif file_size > max_file_size * 1024:
+                        st.sidebar.warning(f"Warning: {uploaded_file.name} too large ({file_size/1024:.1f} KB)")
+                        skipped_count += 1
+                        continue
+                    elif len(content.strip()) == 0:
+                        st.sidebar.warning(f"Warning: {uploaded_file.name} is empty")
+                        skipped_count += 1
+                        continue
+                    
+                    st.session_state.detector.add_file(uploaded_file.name, content, file_size)
+                    processed_count += 1
+
+                except Exception as e:
+                    st.sidebar.error(f"Error processing {uploaded_file.name}: {str(e)}")
                     skipped_count += 1
-                    continue
-                elif file_size > max_file_size * 1024:
-                    st.sidebar.warning(f"Warning: {uploaded_file.name} too large ({file_size/1024:.1f} KB)")
-                    skipped_count += 1
-                    continue
-                elif len(content.strip()) == 0:
-                    st.sidebar.warning(f"Warning: {uploaded_file.name} is empty")
-                    skipped_count += 1
-                    continue
-                
-                st.session_state.detector.add_file(uploaded_file.name, content, file_size)
-                processed_count += 1
-                
-            except Exception as e:
-                st.sidebar.error(f"Error processing {uploaded_file.name}: {str(e)}")
-                skipped_count += 1
+            
+            progress_bar.empty()
+            status_text.empty()
     
     # Display file statistics
     file_count = len(st.session_state.detector.files)
@@ -1149,7 +1538,7 @@ def main():
     # Main analysis tabs
     tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "Analysis Results", 
-        "Visualizations", 
+        " Enhanced Visualizations", 
         "Code Comparison", 
         "Detailed Report",
         "File Explorer",
@@ -1164,43 +1553,8 @@ def main():
         st.header("Plagiarism Analysis Results")
         
         if results:
-            # Summary metrics
-            col1, col2, col3, col4 = st.columns(4)
-            
-            with col1:
-                st.markdown("""
-                <div class="metric-card">
-                    <h3>Total Comparisons</h3>
-                    <h2>{}</h2>
-                </div>
-                """.format(len(results)), unsafe_allow_html=True)
-            
-            with col2:
-                suspicious_count = sum(1 for r in results if r['Status'] == 'Suspicious')
-                st.markdown("""
-                <div class="metric-card">
-                    <h3>Suspicious Pairs</h3>
-                    <h2>{}</h2>
-                </div>
-                """.format(suspicious_count), unsafe_allow_html=True)
-            
-            with col3:
-                avg_similarity = np.mean([r['Similarity'] for r in results])
-                st.markdown("""
-                <div class="metric-card">
-                    <h3>Average Similarity</h3>
-                    <h2>{:.1f}%</h2>
-                </div>
-                """.format(avg_similarity * 100), unsafe_allow_html=True)
-            
-            with col4:
-                max_similarity = max([r['Similarity'] for r in results])
-                st.markdown("""
-                <div class="metric-card">
-                    <h3>Highest Similarity</h3>
-                    <h2>{:.1f}%</h2>
-                </div>
-                """.format(max_similarity * 100), unsafe_allow_html=True)
+            # Enhanced summary metrics
+            create_enhanced_metrics(results)
             
             st.markdown("---")
             
@@ -1242,29 +1596,48 @@ def main():
             st.info("No results to display.")
     
     with tab2:
-        st.header("Advanced Visualizations")
+        st.header(" Enhanced Visualizations Dashboard")
         
         if results and len(results) > 0:
-            fig_heatmap, fig_risk, fig_dist = create_advanced_visualizations(
+            # Enhanced similarity matrix
+            st.subheader(" Enhanced Interactive Similarity Matrix")
+            fig_enhanced_matrix = create_enhanced_similarity_matrix(
                 st.session_state.detector, results, algorithm
             )
+            st.plotly_chart(fig_enhanced_matrix, use_container_width=True)
             
-            # Interactive similarity matrix
-            st.subheader("Interactive Similarity Heatmap")
-            st.plotly_chart(fig_heatmap, use_container_width=True)
+            # Risk assessment gauges
+            st.subheader(" Risk Assessment Gauges")
+            fig_gauges = create_risk_gauges(results)
+            st.plotly_chart(fig_gauges, use_container_width=True)
             
-            col1, col2 = st.columns(2)
+            # File complexity radar
+            st.subheader(" File Complexity Analysis")
+            fig_radar = create_file_complexity_radar(st.session_state.detector)
+            st.plotly_chart(fig_radar, use_container_width=True)
             
-            with col1:
-                st.subheader("Risk Level Distribution")
-                st.plotly_chart(fig_risk, use_container_width=True)
+            # Similarity trends
+            st.subheader(" Similarity Trend Analysis")
+            fig_trends = create_similarity_trends(results)
+            st.plotly_chart(fig_trends, use_container_width=True)
             
-            with col2:
-                st.subheader("Similarity Score Distribution")
-                st.plotly_chart(fig_dist, use_container_width=True)
+            # Algorithm comparison sunburst
+            st.subheader(" Algorithm Performance Sunburst")
+            file_pairs = [(r['File 1'], r['File 2']) for r in results[:10]]  # Top 10 pairs
+            fig_sunburst = create_algorithm_comparison_sunburst(
+                st.session_state.detector, file_pairs
+            )
+            st.plotly_chart(fig_sunburst, use_container_width=True)
+            
+            # Statistics dashboard
+            st.subheader(" Comprehensive Statistics Dashboard")
+            fig_dashboard = create_statistics_dashboard(
+                st.session_state.detector, results
+            )
+            st.plotly_chart(fig_dashboard, use_container_width=True)
             
             # Network graph for high similarities
-            st.subheader("Similarity Network")
+            st.subheader(" Similarity Network Graph")
             high_sim_results = [r for r in results if r['Similarity'] >= threshold]
             
             if high_sim_results:
@@ -1292,7 +1665,14 @@ def main():
                     x1, y1 = pos[edge[1]]
                     edge_x.extend([x0, x1, None])
                     edge_y.extend([y0, y1, None])
-                    edge_info.append(f"{edge[0]} → {edge[1]}: {G[edge[0]][edge[1]]['similarity']}")
+                    # FIXED: Correct way to access edge attributes in NetworkX
+                    try:
+                        similarity = G.edges[edge]['similarity']
+                        edge_info.append(f"{edge[0]} → {edge[1]}: {similarity}")
+                    except KeyError:
+                        # Fallback if edge doesn't exist in expected direction
+                        similarity = G.edges[edge[1], edge[0]]['similarity'] if (edge[1], edge) in G.edges else "N/A"
+                        edge_info.append(f"{edge} → {edge[1]}: {similarity}")
                 
                 edge_trace = go.Scatter(x=edge_x, y=edge_y,
                                       line=dict(width=2, color='red'),
@@ -1308,287 +1688,139 @@ def main():
                     node_x.append(x)
                     node_y.append(y)
                     node_text.append(node)
-                
-                node_trace = go.Scatter(x=node_x, y=node_y,
-                                      mode='markers+text',
-                                      hoverinfo='text',
-                                      text=node_text,
-                                      textposition="middle center",
-                                      marker=dict(size=50,
-                                                color='lightblue',
-                                                line=dict(width=2, color='black')))
-                
-                fig_network = go.Figure()
-                fig_network.add_trace(edge_trace)
-                fig_network.add_trace(node_trace)
-                
-                fig_network.update_layout(
-                    title=dict(
-                        text='Similarity Network (Above Threshold)',
-                        font=dict(size=16)
-                    ),
-                    showlegend=False,
-                    hovermode='closest',
-                    margin=dict(b=20, l=5, r=5, t=40),
-                    xaxis=dict(showgrid=False, zeroline=False, showticklabels=False),
-                    yaxis=dict(showgrid=False, zeroline=False, showticklabels=False)
+
+                node_trace = go.Scatter(
+                    x=node_x, y=node_y,
+                    mode="markers+text",
+                    text=node_text,
+                    textposition="middle center",
+                    hoverinfo="text",
+                    marker=dict(size=20, color="lightblue",
+                                line=dict(width=2, color="black"))
                 )
-                
-                fig_network.add_annotation(
-                    text="Connections show similarities above threshold",
-                    showarrow=False,
-                    xref="paper", yref="paper",
-                    x=0.005, y=-0.002
+
+                fig_network = go.Figure(
+                    data=[edge_trace, node_trace],
+                    layout=go.Layout(
+                        title=" Similarity Network Graph",
+                        titlefont_size=16,
+                        showlegend=False,
+                        hovermode="closest",
+                        margin=dict(b=20, l=5, r=5, t=40),
+                        annotations=[dict(
+                            text="Nodes are files; edges show similarity ≥ threshold",
+                            showarrow=False, xref="paper", yref="paper",
+                            x=0.005, y=-0.002, xanchor="left", yanchor="bottom",
+                            font=dict(size=12))],
+                        xaxis=dict(showgrid=False, zeroline=False,
+                                   showticklabels=False),
+                        yaxis=dict(showgrid=False, zeroline=False,
+                                   showticklabels=False)
+                    )
                 )
-                
                 st.plotly_chart(fig_network, use_container_width=True)
             else:
-                st.info("No similarities above threshold to display in network.")
-        
-        else:
-            st.info("No data available for visualization.")
-    
+                st.info("No high-similarity connections to plot.")
+
+    # ------------- TAB 3 — CODE COMPARISON -----------------
     with tab3:
-        st.header("Side-by-Side Code Comparison")
-        
-        if file_count >= 2:
-            filenames = list(st.session_state.detector.files.keys())
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                file1 = st.selectbox("Select First File", filenames, key="compare_file1")
-            with col2:
-                file2 = st.selectbox("Select Second File", filenames, key="compare_file2")
-            
-            if file1 != file2:
-                # Calculate similarity with multiple algorithms
-                st.subheader("Multi-Algorithm Analysis")
-                
-                similarities = {}
-                for alg in st.session_state.detector.algorithms[:6]:  # Top 6 algorithms
-                    sim = st.session_state.detector.calculate_similarity(file1, file2, alg)
-                    similarities[alg] = sim
-                
-                # Display similarities in a nice format
-                cols = st.columns(3)
-                for i, (alg, sim) in enumerate(similarities.items()):
-                    with cols[i % 3]:
-                        color = "Red" if sim >= 0.8 else "Yellow" if sim >= 0.6 else "Green"
-                        st.metric(f"{alg}", f"{sim:.3f}", f"{sim*100:.1f}%")
-                
-                # File metadata comparison
-                st.subheader("File Metadata Comparison")
-                meta1 = st.session_state.detector.file_metadata[file1]
-                meta2 = st.session_state.detector.file_metadata[file2]
-                
-                comparison_df = pd.DataFrame({
-                    file1: [meta1['size'], meta1['lines'], meta1['functions'], meta1['complexity']],
-                    file2: [meta2['size'], meta2['lines'], meta2['functions'], meta2['complexity']]
-                }, index=['Size (bytes)', 'Lines of Code', 'Functions', 'Complexity'])
-                
-                st.dataframe(comparison_df, use_container_width=True)
-                
-                # Side-by-side code display
-                st.subheader("Code Comparison")
-                col1, col2 = st.columns(2)
-                
-                with col1:
-                    st.markdown(f"**{file1}**")
-                    st.code(st.session_state.detector.files[file1], language='cpp', line_numbers=True)
-                
-                with col2:
-                    st.markdown(f"**{file2}**")
-                    st.code(st.session_state.detector.files[file2], language='cpp', line_numbers=True)
-                
-                # Detailed diff analysis
-                st.subheader("Detailed Difference Analysis")
-                
-                code1_lines = st.session_state.detector.files[file1].splitlines()
-                code2_lines = st.session_state.detector.files[file2].splitlines()
-                
-                diff = list(difflib.unified_diff(code1_lines, code2_lines, 
-                                               fromfile=file1, tofile=file2, lineterm=''))
-                
-                if diff:
-                    diff_text = '\n'.join(diff)
-                    st.code(diff_text, language='diff')
-                else:
-                    st.success("Files are identical!")
-            
-            else:
-                st.warning("Please select different files to compare.")
-    
+        st.header("Code Comparison")
+
+        if len(st.session_state.detector.files) >= 2:
+            c1, c2 = st.columns(2)
+            with c1:
+                file1 = st.selectbox("Select First File",
+                                     list(st.session_state.detector.files.keys()),
+                                     key="file1_select")
+            with c2:
+                file2 = st.selectbox("Select Second File",
+                                     list(st.session_state.detector.files.keys()),
+                                     key="file2_select")
+
+            if file1 and file2 and file1 != file2:
+                st.subheader(f"{file1} ↔ {file2}")
+
+                algo_rows = []
+                for algo in st.session_state.detector.algorithms:
+                    sim = st.session_state.detector.calculate_similarity(file1, file2, algo)
+                    algo_rows.append(dict(
+                        Algorithm=algo,
+                        Similarity=f"{sim*100:.2f}%",
+                        Risk=("High" if sim >= .8 else
+                              "Medium" if sim >= .6 else
+                              "Low" if sim >= .4 else "Safe")
+                    ))
+                st.dataframe(pd.DataFrame(algo_rows), use_container_width=True)
+
+                colL, colR = st.columns(2)
+                with colL:
+                    st.subheader(file1)
+                    st.code(st.session_state.detector.files[file1], language="cpp")
+                with colR:
+                    st.subheader(file2)
+                    st.code(st.session_state.detector.files[file2], language="cpp")
+        else:
+            st.info("Upload at least two files to compare.")
+
+    # ------------- TAB 4 — DETAILED REPORT -----------------
     with tab4:
-        st.header("Detailed Analysis Report")
-        
+        st.header("Detailed Report")
         if results:
-            report = generate_detailed_report(
-                st.session_state.detector, results, algorithm, threshold
-            )
-            
-            st.markdown(report)
-            
-            # Advanced statistics
-            st.subheader("Statistical Analysis")
-            
-            similarities = [r['Similarity'] for r in results]
-            
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Mean Similarity", f"{np.mean(similarities):.3f}")
-            with col2:
-                st.metric("Std Deviation", f"{np.std(similarities):.3f}")
-            with col3:
-                st.metric("Median Similarity", f"{np.median(similarities):.3f}")
-            
-            # Percentile analysis
-            percentiles = [25, 50, 75, 90, 95, 99]
-            perc_values = [np.percentile(similarities, p) for p in percentiles]
-            
-            perc_df = pd.DataFrame({
-                'Percentile': [f"{p}th" for p in percentiles],
-                'Similarity Score': [f"{v:.3f}" for v in perc_values]
-            })
-            
-            st.subheader("Percentile Analysis")
-            st.dataframe(perc_df, use_container_width=True)
-        
+            md_report = generate_detailed_report(st.session_state.detector,
+                                                 results, algorithm, threshold)
+            st.markdown(md_report)
+            st.download_button(
+                " Download Report (Markdown)",
+                md_report,
+                file_name=f"plagiarism_report_{datetime.now():%Y%m%d_%H%M%S}.md",
+                mime="text/markdown")
         else:
-            st.info("No results available for detailed report.")
-    
+            st.info("Run an analysis first.")
+
+    # ------------- TAB 5 — FILE EXPLORER -------------------
     with tab5:
-        st.header("File Explorer & Metadata")
-        
+        st.header("File Explorer")
         if st.session_state.detector.files:
-            for filename, content in st.session_state.detector.files.items():
-                with st.expander(f"{filename}"):
-                    metadata = st.session_state.detector.file_metadata[filename]
-                    
-                    col1, col2 = st.columns([1, 2])
-                    
-                    with col1:
-                        st.markdown("**File Statistics:**")
-                        st.write(f"• Size: {metadata['size']} bytes")
-                        st.write(f"• Lines: {metadata['lines']}")
-                        st.write(f"• Functions: {metadata['functions']}")
-                        st.write(f"• Complexity: {metadata['complexity']}")
-                        st.write(f"• Includes: {len(metadata['includes'])}")
-                        st.write(f"• Uploaded: {metadata['upload_time'].strftime('%H:%M:%S')}")
-                        
-                        if metadata['includes']:
-                            st.markdown("**Includes:**")
-                            for include in metadata['includes']:
-                                st.code(include, language='cpp')
-                    
-                    with col2:
-                        st.markdown("**Code Preview:**")
-                        preview_lines = content.split('\n')[:20]
-                        preview = '\n'.join(preview_lines)
-                        if len(content.split('\n')) > 20:
-                            lines_count = len(content.split('\n')) - 20
-                            preview += f"\n... ({lines_count} more lines)"
-                        st.code(preview, language='cpp')
+            explorer_df = pd.DataFrame([
+                dict(Filename=f,
+                     Size=meta["size"],
+                     Lines=meta["lines"],
+                     Functions=meta["functions"],
+                     Complexity=meta["complexity"],
+                     Includes=len(meta["includes"]))
+                for f, meta in st.session_state.detector.file_metadata.items()
+            ])
+            st.dataframe(explorer_df, use_container_width=True)
 
+            view_file = st.selectbox("View file content",
+                                     list(st.session_state.detector.files.keys()))
+            st.code(st.session_state.detector.files[view_file], language="cpp")
+
+            if st.button(" Clear All Files"):
+                st.session_state.detector = CompetitiveProgrammingPlagiarismDetector()
+                st.success("Cleared; reload to start fresh.")
+                st.rerun()
         else:
-            st.info("No files uploaded yet.")
-    
+            st.info("No files yet.")
+
+    # ------------- TAB 6 — EXPORT RESULTS ------------------
     with tab6:
-        st.header("Export & Download Results")
-        
+        st.header("Export Results")
         if results:
-            col1, col2 = st.columns(2)
-            
-            with col1:
-                st.subheader("Export Options")
-                
-                # CSV Export
-                df = pd.DataFrame(results)
-                csv = df.to_csv(index=False)
-                st.download_button(
-                    label="Download CSV Report",
-                    data=csv,
-                    file_name=f"plagiarism_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv",
-                    mime="text/csv"
-                )
-                
-                # JSON Export
-                import json
-                json_data = json.dumps(results, indent=2, default=str)
-                st.download_button(
-                    label="Download JSON Report",
-                    data=json_data,
-                    file_name=f"plagiarism_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
-                    mime="application/json"
-                )
-                
-                # Detailed Report
-                detailed_report = generate_detailed_report(
-                    st.session_state.detector, results, algorithm, threshold
-                )
-                st.download_button(
-                    label="Download Detailed Report",
-                    data=detailed_report,
-                    file_name=f"detailed_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
-                    mime="text/markdown"
-                )
-            
-            with col2:
-                st.subheader("Export Settings")
-                
-                include_metadata = st.checkbox("Include file metadata", value=True)
-                include_code_snippets = st.checkbox("Include code snippets", value=False)
-                only_suspicious = st.checkbox("Only suspicious pairs", value=False)
-                
-                if st.button("Generate Custom Report"):
-                    custom_results = results
-                    if only_suspicious:
-                        custom_results = [r for r in results if r['Status'] == 'Suspicious']
-                    
-                    custom_report = f"""
-# Custom Plagiarism Report
-Generated: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
-Algorithm: {algorithm}
-Threshold: {threshold}
-
-## Results Summary
-Total Comparisons: {len(custom_results)}
-"""
-                    
-                    for result in custom_results:
-                        custom_report += f"""
-### {result['File 1']} → {result['File 2']}
-- Similarity: {result['Percentage']}
-- Risk Level: {result['Risk Level']}
-- Status: {result['Status']}
-"""
-                        
-                        if include_code_snippets:
-                            custom_report += f"""
-#### Code Snippets:
-**{result['File 1']}:**
-
-**{result['File 2']}:**
-
-"""
-                    
-                    st.download_button(
-                        label="Download Custom Report",
-                        data=custom_report,
-                        file_name=f"custom_report_{datetime.now().strftime('%Y%m%d_%H%M%S')}.md",
-                        mime="text/markdown"
-                    )
-        
+            data_df = pd.DataFrame(results)
+            st.download_button("Download CSV",
+                               data_df.to_csv(index=False),
+                               file_name="results.csv",
+                               mime="text/csv")
         else:
-            st.info("No results available for export.")
-    
-    # Enhanced Footer
-    st.markdown("""
-    <div class="footer">
-        <h3>Competitive Programming Plagiarism Checker</h3>
-        <p>Advanced C++ code similarity detection with 12 sophisticated algorithms</p>
-        <p>Built for competitive programming • Optimized for accuracy • Enhanced UI</p>
-    </div>
-    """, unsafe_allow_html=True)
+            st.info("Nothing to export yet.")
+
+    # --------------------- FOOTER ---------------------------
+    st.markdown("---")
+    st.markdown(
+        "<div class='footer'>© 2024 • Competitive Programming Plagiarism Checker</div>",
+        unsafe_allow_html=True)
+
 
 if __name__ == "__main__":
     main()
