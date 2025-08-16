@@ -24,7 +24,7 @@ import os
 # Configure Streamlit page
 st.set_page_config(
     page_title="Competitive Programming Plagiarism Checker",
-    page_icon="",
+    page_icon="🔍",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -278,96 +278,6 @@ html, body, [class*="css"] {
     background: #f8fafc !important;
 }
 
-/* Enhanced sidebar styling */
-.css-1d391kg {
-    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-    border-right: 1px solid #e2e8f0;
-    box-shadow: 4px 0 12px rgba(0, 0, 0, 0.05);
-}
-
-/* Enhanced expander styling */
-.streamlit-expanderContent {
-    background: white !important;
-    color: #334155 !important;
-    border-radius: 0 0 16px 16px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-    border: 1px solid #e2e8f0;
-    padding: 2rem !important;
-}
-
-/* Enhanced code block styling */
-.stCodeBlock {
-    background: #f8fafc !important;
-    border-radius: 12px;
-    border: 1px solid #e2e8f0;
-    padding: 1.5rem !important;
-    font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace !important;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-/* Enhanced metric container styling */
-[data-testid="metric-container"] {
-    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%) !important;
-    border: 1px solid #e2e8f0 !important;
-    padding: 2rem !important;
-    border-radius: 18px !important;
-    color: #1e293b !important;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08) !important;
-    transition: all 0.3s ease !important;
-}
-
-[data-testid="metric-container"]:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12) !important;
-}
-
-[data-testid="metric-container"] > div {
-    color: #1e293b !important;
-    font-weight: 600;
-}
-
-[data-testid="metric-container"] [data-testid="metric-value"] {
-    font-size: 2.5rem !important;
-    font-weight: 700 !important;
-    color: #0f172a !important;
-}
-
-[data-testid="metric-container"] [data-testid="metric-label"] {
-    font-size: 0.9rem !important;
-    font-weight: 600 !important;
-    color: #64748b !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
-}
-
-/* Enhanced selectbox and input styling */
-.stSelectbox > div > div {
-    background: white;
-    border-radius: 12px;
-    border: 2px solid #e2e8f0;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
-}
-
-.stSelectbox > div > div:focus-within {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-}
-
-/* File uploader styling */
-.stFileUploader {
-    border-radius: 16px;
-    border: 2px dashed #cbd5e1;
-    background: rgba(248, 250, 252, 0.5);
-    padding: 2rem;
-    transition: all 0.3s ease;
-}
-
-.stFileUploader:hover {
-    border-color: #667eea;
-    background: rgba(102, 126, 234, 0.05);
-}
-
 /* Footer styling */
 .footer {
     text-align: center;
@@ -430,7 +340,7 @@ html, body, [class*="css"] {
 </style>
 """, unsafe_allow_html=True)
 
-# Your existing CompetitiveProgrammingPlagiarismDetector class
+# CompetitiveProgrammingPlagiarismDetector class
 class CompetitiveProgrammingPlagiarismDetector:
     def __init__(self):
         self.files = {}
@@ -686,7 +596,7 @@ class CompetitiveProgrammingPlagiarismDetector:
         elif algorithm == "Jaccard Similarity":
             return self.jaccard_similarity(code1, code2)
         elif algorithm == "Cosine Similarity":
-            return self.cosine_similarity(code1, code2)
+            return self.cosine_similarity_method(code1, code2)  # FIXED: renamed method
         elif algorithm == "N-Gram Analysis":
             return self.ngram_similarity(code1, code2)
         elif algorithm == "Control Flow Analysis":
@@ -776,7 +686,7 @@ class CompetitiveProgrammingPlagiarismDetector:
         
         return intersection / union if union > 0 else 0
 
-    def cosine_similarity_method(self, code1, code2):
+    def cosine_similarity_method(self, code1, code2):  # FIXED: renamed to avoid conflict
         """Cosine similarity using TF-IDF"""
         proc1 = self.preprocess_cpp_code(code1)
         proc2 = self.preprocess_cpp_code(code2)
@@ -918,7 +828,7 @@ def create_enhanced_similarity_matrix(detector, results, algorithm):
         hovertemplate='<b>%{y}</b> vs <b>%{x}</b><br>Similarity: %{z:.3f}<extra></extra>'
     ))
     
-    # FIXED: Use correct title format
+    # FIXED: Use proper title format
     fig.update_layout(
         title=dict(text=f"📊 Enhanced Similarity Matrix - {algorithm}", font=dict(size=16)),
         xaxis_title="Files",
@@ -986,6 +896,7 @@ def create_risk_gauges(results):
             }
         ), row=pos[0], col=pos[1])
     
+    # FIXED: Use proper title format
     fig.update_layout(
         height=500, 
         title=dict(text="⚡ Risk Assessment Gauges", font=dict(size=16)),
@@ -1026,6 +937,7 @@ def create_file_complexity_radar(detector):
             opacity=0.7
         ))
     
+    # FIXED: Use proper title format
     fig.update_layout(
         polar=dict(
             radialaxis=dict(
@@ -1075,6 +987,7 @@ def create_similarity_trends(results):
     fig.add_hline(y=50, line_dash="dash", line_color="red", 
                   annotation_text="Threshold (50%)")
     
+    # FIXED: Use proper title format
     fig.update_layout(
         title=dict(text="📈 Similarity Trend Analysis", font=dict(size=16)),
         xaxis_title="File Pairs",
@@ -1139,6 +1052,7 @@ def create_algorithm_comparison_sunburst(detector, file_pairs):
         branchvalues="total"
     ))
     
+    # FIXED: Use proper title format
     fig.update_layout(
         title=dict(text="☀️ Algorithm Performance Sunburst", font=dict(size=16)),
         height=600,
@@ -1189,6 +1103,7 @@ def create_statistics_dashboard(detector, results):
     similarities = [r['Similarity'] * 100 for r in results]
     fig.add_trace(go.Histogram(x=similarities, name="Similarities"), row=2, col=2)
     
+    # FIXED: Use proper title format
     fig.update_layout(
         height=700, 
         title=dict(text="📊 Comprehensive Statistics Dashboard", font=dict(size=16)),
@@ -1251,64 +1166,6 @@ def create_enhanced_metrics(results):
             </div>
         </div>
         """, unsafe_allow_html=True)
-
-def create_advanced_visualizations(detector, results, algorithm):
-    """Create advanced visualizations"""
-    if not results:
-        return None, None, None
-    
-    # 1. Interactive Similarity Matrix
-    filenames = list(detector.files.keys())
-    n = len(filenames)
-    matrix = np.zeros((n, n))
-    
-    for i in range(n):
-        for j in range(n):
-            if i == j:
-                matrix[i][j] = 1.0
-            elif i < j:
-                similarity = detector.calculate_similarity(filenames[i], filenames[j], algorithm)
-                matrix[i][j] = similarity
-                matrix[j][i] = similarity
-    
-    fig_heatmap = px.imshow(
-        matrix,
-        x=filenames,
-        y=filenames,
-        color_continuous_scale='Reds',
-        title=f'Similarity Matrix - {algorithm}',
-        labels=dict(color="Similarity Score")
-    )
-    fig_heatmap.update_layout(margin=dict(t=80, b=40, l=40, r=40))
-    
-    # 2. Risk Distribution
-    risk_counts = Counter([r['Risk Level'] for r in results])
-    fig_risk = px.pie(
-        values=list(risk_counts.values()),
-        names=list(risk_counts.keys()),
-        title="Risk Level Distribution",
-        color_discrete_map={
-            "High Risk": "#e53e3e",
-            "Medium Risk": "#d69e2e", 
-            "Low Risk": "#dd6b20",
-            "Safe": "#38a169"
-        }
-    )
-    fig_risk.update_layout(margin=dict(t=80, b=40, l=40, r=40))
-    
-    # 3. Similarity Score Distribution
-    similarities = [r['Similarity'] for r in results]
-    fig_dist = px.histogram(
-        x=similarities,
-        nbins=20,
-        title="Similarity Score Distribution",
-        labels={'x': 'Similarity Score', 'y': 'Count'}
-    )
-    fig_dist.add_vline(x=0.5, line_dash="dash", line_color="red", 
-                       annotation_text="Threshold")
-    fig_dist.update_layout(margin=dict(t=80, b=40, l=40, r=40))
-    
-    return fig_heatmap, fig_risk, fig_dist
 
 def generate_detailed_report(detector, results, algorithm, threshold):
     """Generate detailed analysis report"""
@@ -1699,7 +1556,7 @@ def main():
                                 line=dict(width=2, color="black"))
                 )
 
-                # FIXED: Use correct title format in layout
+                # FIXED: Use proper title format in layout
                 fig_network = go.Figure(
                     data=[edge_trace, node_trace],
                     layout=go.Layout(
